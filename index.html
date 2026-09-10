@@ -61,7 +61,12 @@
 
   .screen{ display:flex; flex-direction:column; flex:1; }
   .screen.hidden{ display:none; }
-  #mapScreen{ align-items:center; text-align:center; position:relative; }
+  #mapScreen{ align-items:center; text-align:center; position:relative;
+    background: radial-gradient(120% 70% at 50% -10%, #FFD9A0 0%, #FFB088 35%, #E888A8 65%, #B888D8 100%);
+    margin:-34px -16px 0; padding:34px 16px 20px; border-radius:0 0 30px 30px; overflow:hidden; }
+  .string-lights{ position:absolute; top:0; left:0; right:0; height:34px; z-index:3; pointer-events:none; }
+  .bulb{ position:absolute; width:10px; height:10px; border-radius:50%; box-shadow:0 0 8px 2px currentColor; animation: bulbGlow 1.8s ease-in-out infinite; }
+  @keyframes bulbGlow{ 0%,100%{ opacity:.6;} 50%{ opacity:1;} }
 
   header{
     display:flex; align-items:center; justify-content:space-between; gap:6px;
@@ -279,6 +284,19 @@
   .woof-tower .wbone::before{ left:-3px; } .woof-tower .wbone::after{ right:-3px; }
   .landmark-label{ font-family:'Baloo 2',sans-serif; font-weight:700; font-size:10.5px; color:var(--ink); margin-top:4px; line-height:1.15; opacity:.85; }
 
+  .ferris-wheel{ position:relative; width:90px; height:90px; margin:0 auto; animation: ferrisSpin 14s linear infinite; }
+  @keyframes ferrisSpin{ to{ transform:rotate(360deg); } }
+  .ferris-wheel .rim{ position:absolute; inset:0; border:5px solid var(--ink); border-radius:50%; }
+  .ferris-wheel .hub{ position:absolute; top:50%; left:50%; width:12px; height:12px; background:var(--gold); border:2.5px solid var(--ink); border-radius:50%; transform:translate(-50%,-50%); z-index:2; }
+  .ferris-wheel .spoke{ position:absolute; top:50%; left:50%; width:2.5px; height:45px; background:var(--ink); transform-origin:top center; }
+  .ferris-wheel .gondola{ position:absolute; width:13px; height:13px; border:2.5px solid var(--ink); border-radius:3px; }
+  .ferris-stand{ width:6px; height:20px; background:var(--ink); margin:0 auto; }
+  .popcorn-cart{ position:relative; width:52px; height:58px; margin:0 auto; }
+  .popcorn-cart .awning{ position:absolute; top:0; left:0; width:52px; height:14px; background: repeating-linear-gradient(90deg, var(--red) 0 8px, #fff 8px 16px); border:2.5px solid var(--ink); border-radius:5px 5px 0 0; }
+  .popcorn-cart .box{ position:absolute; top:12px; left:2px; width:48px; height:32px; background:#F5DEB3; border:2.5px solid var(--ink); border-radius:0 0 5px 5px; }
+  .popcorn-cart .wheel{ position:absolute; bottom:-6px; width:10px; height:10px; background:var(--ink); border-radius:50%; }
+  .popcorn-cart .wheel.l{ left:8px; } .popcorn-cart .wheel.r{ right:8px; }
+
   .mascot-wrap{ margin:6px auto 10px; }
   .mascot{ position:relative; width:100px; height:92px; margin:0 auto; }
   .mascot-tail{ position:absolute; bottom:26px; left:2px; width:11px; height:28px; background:#C98F4E; border:3px solid var(--ink); border-radius:10px; transform-origin:bottom center; animation: wag 0.4s ease-in-out infinite alternate; }
@@ -354,6 +372,7 @@
 <div id="app">
 
   <div id="mapScreen" class="screen">
+    <div class="string-lights" id="stringLights"></div>
     <div class="map-title">Best in Show</div>
     <div class="map-sub">Tap a level to strut your pup down the runway!</div>
     <div class="mascot-wrap">
@@ -364,6 +383,25 @@
     <div class="map-avatar" id="mapAvatar">
       <div class="diva" id="divaAvatar" style="transform:scale(0.4); transform-origin:top left;"></div>
     </div>
+    <div class="landmark" style="top:80px; right:-4px;">
+      <div class="ferris-wheel">
+        <div class="rim"></div><div class="hub"></div>
+        <div class="spoke" style="transform:rotate(0deg);"></div>
+        <div class="spoke" style="transform:rotate(60deg);"></div>
+        <div class="spoke" style="transform:rotate(120deg);"></div>
+        <div class="spoke" style="transform:rotate(180deg);"></div>
+        <div class="spoke" style="transform:rotate(240deg);"></div>
+        <div class="spoke" style="transform:rotate(300deg);"></div>
+        <div class="gondola" style="left:78px; top:39px; background:var(--red);"></div>
+        <div class="gondola" style="left:60px; top:74px; background:var(--blue);"></div>
+        <div class="gondola" style="left:16px; top:74px; background:var(--yellow);"></div>
+        <div class="gondola" style="left:-2px; top:39px; background:var(--green);"></div>
+        <div class="gondola" style="left:16px; top:4px; background:var(--pink);"></div>
+        <div class="gondola" style="left:60px; top:4px; background:var(--purple);"></div>
+      </div>
+      <div class="ferris-stand"></div>
+      <div class="landmark-label">The Big Wheel</div>
+    </div>
     <div class="landmark" style="top:300px; right:2px;">
       <div class="kibble-tower">
         <div class="biscuit" style="top:0;"></div>
@@ -373,6 +411,13 @@
         <div class="biscuit" style="top:52px; left:8px;"></div>
       </div>
       <div class="landmark-label">Leaning Tower<br>of Kibble</div>
+    </div>
+    <div class="landmark" style="top:440px; left:-2px;">
+      <div class="popcorn-cart">
+        <div class="awning"></div><div class="box"></div>
+        <div class="wheel l"></div><div class="wheel r"></div>
+      </div>
+      <div class="landmark-label">Popcorn!</div>
     </div>
     <div class="landmark" style="top:560px; left:2px;">
       <div class="woof-tower">
@@ -521,6 +566,20 @@
     const el = document.getElementById(id);
     if(el) el.innerHTML = divaHTML();
   });
+
+  const bulbColors = ['#FFD447','#FF5A5F','#4FB8E8','#7BC96F','#FF7BAC'];
+  const lightsEl = document.getElementById('stringLights');
+  for(let i=0;i<11;i++){
+    const b = document.createElement('div');
+    b.className = 'bulb';
+    b.style.color = bulbColors[i % bulbColors.length];
+    b.style.background = bulbColors[i % bulbColors.length];
+    b.style.left = (i*9 + 4)+'%';
+    const sag = Math.sin((i/10)*Math.PI) * 14;
+    b.style.top = (2 + sag)+'px';
+    b.style.animationDelay = (i*0.15)+'s';
+    lightsEl.appendChild(b);
+  }
 
   const decoKinds = ['bone','bow','ball','paw'];
   for(let i=0;i<14;i++){
@@ -1084,10 +1143,10 @@
   });
 
   function showMap(){
-    renderMap();
-    setMascotMessage();
     document.getElementById('gameScreen').classList.add('hidden');
     document.getElementById('mapScreen').classList.remove('hidden');
+    renderMap();
+    setMascotMessage();
   }
   const NODE_COORDS = [
     {x:160, y:30}, {x:80, y:150}, {x:230, y:270}, {x:70, y:390}, {x:200, y:510}, {x:150, y:615}
@@ -1097,7 +1156,9 @@
     path.innerHTML = '';
     const pts = NODE_COORDS.map(c => c.x+','+c.y).join(' ');
     path.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="640" style="position:absolute;left:0;top:0;pointer-events:none;z-index:0;">' +
-      '<polyline points="'+pts+'" fill="none" stroke="rgba(59,42,32,0.45)" stroke-width="4" stroke-dasharray="2,11" stroke-linecap="round"/></svg>';
+      '<polyline points="'+pts+'" fill="none" stroke="#D9B896" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<polyline points="'+pts+'" fill="none" stroke="#C9A57C" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1,0" opacity="0.4"/>' +
+      '<polyline points="'+pts+'" fill="none" stroke="#8B6F4E" stroke-width="3" stroke-dasharray="3,14" stroke-linecap="round"/></svg>';
     const total = LEVELS.length;
     for(let i=0;i<=total;i++){
       const isBoss = i === total;
