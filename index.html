@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --sky-top:#5FB8EE; --sky-bot:#AEE3F8; --sun:#FFD447; --grass:#7BC96F;
+    --sky-top:#FF9FC7; --sky-bot:#FFD98A; --sun:#FFD447; --grass:#E3B77D;
     --gold:#E8B830; --ink:#3B2A20; --cream:#FFFBF0; --text:#3B2A20; --text-dim:#8A7A6C;
     --red:#FF5A5F; --yellow:#FFD447; --blue:#4FB8E8; --green:#7BC96F; --pink:#FF7BAC; --purple:#B47BE0; --orange:#FFA542;
   }
@@ -18,7 +18,7 @@
   body{
     background:
       repeating-linear-gradient(90deg, rgba(255,255,255,0.14) 0 16px, transparent 16px 34px),
-      linear-gradient(var(--sky-top), var(--sky-bot) 55%, var(--grass) 55%, #5FAE52 100%);
+      linear-gradient(var(--sky-top), var(--sky-bot) 55%, var(--grass) 55%, #C99458 100%);
     color:var(--text); font-family:'Poppins', system-ui, sans-serif;
     display:flex; justify-content:center; position:relative;
   }
@@ -65,6 +65,14 @@
     background: radial-gradient(120% 70% at 50% -10%, #FFD9A0 0%, #FFB088 35%, #E888A8 65%, #B888D8 100%);
     margin:-34px -16px 0; padding:34px 16px 20px; border-radius:0 0 30px 30px; overflow:hidden; }
   .string-lights{ position:absolute; top:0; left:0; right:0; height:34px; z-index:3; pointer-events:none; }
+  .big-top{ position:absolute; bottom:0; left:-32px; width:140px; z-index:0; pointer-events:none; }
+  .big-top .pole{ position:absolute; top:-14px; left:67px; width:3px; height:16px; background:var(--ink); }
+  .big-top .flag{ position:absolute; top:-16px; left:70px; width:0; height:0; border-left:10px solid var(--gold); border-top:7px solid transparent; border-bottom:7px solid transparent; }
+  .big-top .canopy{ width:0; height:0; margin:0 auto; border-left:70px solid transparent; border-right:70px solid transparent; border-bottom:82px solid var(--red); }
+  .big-top .base{ width:140px; height:24px; background:var(--cream); border:3px solid var(--ink); border-top:none; margin-top:-4px; }
+  .big-top .valance{ width:140px; height:15px; margin-top:-2px;
+    background-image: radial-gradient(circle at 12px 0, transparent 11px, var(--red) 11.5px), radial-gradient(circle at 36px 0, transparent 11px, #fff 11.5px);
+    background-size:48px 15px; background-repeat:repeat-x; }
   .bulb{ position:absolute; width:10px; height:10px; border-radius:50%; box-shadow:0 0 8px 2px currentColor; animation: bulbGlow 1.8s ease-in-out infinite; }
   @keyframes bulbGlow{ 0%,100%{ opacity:.6;} 50%{ opacity:1;} }
 
@@ -373,6 +381,12 @@
 
   <div id="mapScreen" class="screen">
     <div class="string-lights" id="stringLights"></div>
+    <div class="big-top">
+      <div class="pole"></div><div class="flag"></div>
+      <div class="canopy"></div>
+      <div class="base"></div>
+      <div class="valance"></div>
+    </div>
     <div class="map-title">Best in Show</div>
     <div class="map-sub">Tap a level to strut your pup down the runway!</div>
     <div class="mascot-wrap">
@@ -625,10 +639,13 @@
     }catch(e){}
   }
   const BARKS = ['Woof!','Yip!','Bark!','Arf!'];
-  function playExit(){ tone(700,0.08,'sine',0.1,0); bark(BARKS[Math.floor(Math.random()*BARKS.length)]); }
-  function playBlocked(){ tone(300,0.1,'sawtooth',0.08,0); tone(220,0.12,'sawtooth',0.08,90); tone(150,0.16,'sawtooth',0.09,180); }
-  function playWin(){ [523,659,784,1047].forEach((f,i)=>tone(f,0.15,'sine',0.12,i*90)); bark('Best in show!', 1.4, 1.0); }
-  function playBooster(){ tone(1046,0.15,'square',0.15,0); tone(1568,0.18,'square',0.15,100); }
+  function haptic(pattern){
+    if(navigator.vibrate){ try{ navigator.vibrate(pattern); }catch(e){} }
+  }
+  function playExit(){ tone(700,0.08,'sine',0.1,0); bark(BARKS[Math.floor(Math.random()*BARKS.length)]); haptic(18); }
+  function playBlocked(){ tone(300,0.1,'sawtooth',0.08,0); tone(220,0.12,'sawtooth',0.08,90); tone(150,0.16,'sawtooth',0.09,180); haptic([12,40,12]); }
+  function playWin(){ [523,659,784,1047].forEach((f,i)=>tone(f,0.15,'sine',0.12,i*90)); bark('Best in show!', 1.4, 1.0); haptic([20,60,20,60,40]); }
+  function playBooster(){ tone(1046,0.15,'square',0.15,0); tone(1568,0.18,'square',0.15,100); haptic(25); }
 
   const MASCOT_MESSAGES = ["Let's find your forever home!","You've got this, pup!","Sniff out the path ahead!","Every dog has its day!","Fetch that next level!","Paws crossed for you!"];
   function setMascotMessage(){
@@ -1156,9 +1173,11 @@
     path.innerHTML = '';
     const pts = NODE_COORDS.map(c => c.x+','+c.y).join(' ');
     path.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="640" style="position:absolute;left:0;top:0;pointer-events:none;z-index:0;">' +
-      '<polyline points="'+pts+'" fill="none" stroke="#D9B896" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '<polyline points="'+pts+'" fill="none" stroke="#C9A57C" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1,0" opacity="0.4"/>' +
-      '<polyline points="'+pts+'" fill="none" stroke="#8B6F4E" stroke-width="3" stroke-dasharray="3,14" stroke-linecap="round"/></svg>';
+      '<defs><pattern id="candyStripe" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
+      '<rect width="14" height="14" fill="#FFD9E8"/><rect width="7" height="14" fill="#fff"/></pattern></defs>' +
+      '<polyline points="'+pts+'" fill="none" stroke="#C9A57C" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<polyline points="'+pts+'" fill="none" stroke="#E3C398" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<polyline points="'+pts+'" fill="none" stroke="url(#candyStripe)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     const total = LEVELS.length;
     for(let i=0;i<=total;i++){
       const isBoss = i === total;
@@ -1207,17 +1226,16 @@
   function positionAvatar(){
     const avatar = document.getElementById('mapAvatar');
     if(!avatar) return;
-    let targetNode = document.querySelector('.map-node.current');
-    if(!targetNode){
-      const completedNodes = document.querySelectorAll('.map-node.completed');
-      targetNode = completedNodes[completedNodes.length-1];
-    }
-    if(!targetNode){ avatar.style.display='none'; return; }
-    avatar.style.display='';
+    const total = LEVELS.length;
+    const idx = Math.min(state.highestUnlocked, total);
+    const pathEl = document.getElementById('mapPath');
+    const pathRect = pathEl.getBoundingClientRect();
     const screenRect = document.getElementById('mapScreen').getBoundingClientRect();
-    const nodeRect = targetNode.getBoundingClientRect();
-    avatar.style.left = (nodeRect.left - screenRect.left + nodeRect.width/2) + 'px';
-    avatar.style.top = (nodeRect.top - screenRect.top - 4) + 'px';
+    const offsetX = pathRect.left - screenRect.left;
+    const offsetY = pathRect.top - screenRect.top;
+    avatar.style.display = '';
+    avatar.style.left = (offsetX + NODE_COORDS[idx].x) + 'px';
+    avatar.style.top = (offsetY + NODE_COORDS[idx].y - 6) + 'px';
   }
   document.getElementById('mapBtn').addEventListener('click', showMap);
 
