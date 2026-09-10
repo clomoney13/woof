@@ -246,7 +246,8 @@
   .map-title{ font-family:'Baloo 2', sans-serif; font-weight:800; font-size:26px; color:var(--red); margin:6px 0 2px; }
   .map-sub{ font-size:12.5px; color:var(--ink); font-weight:600; margin-bottom:6px; opacity:.8; }
   .map-path{ position:relative; width:300px; margin:14px auto 20px; height:640px; }
-  .map-avatar{ position:absolute; z-index:5; transform:translate(-50%,-100%);
+  .map-avatar{ position:absolute; z-index:5; width:40px; height:60px;
+    transform:translate(-50%,-100%);
     transition: left .6s cubic-bezier(.34,1.2,.64,1), top .6s cubic-bezier(.34,1.2,.64,1); pointer-events:none; }
   .map-node{ display:flex; flex-direction:column; align-items:center; gap:5px; position:absolute; z-index:1; cursor:pointer; transform:translate(-50%,-50%); }
   .map-node.locked{ cursor:default; }
@@ -361,7 +362,7 @@
     </div>
     <div class="map-path" id="mapPath"></div>
     <div class="map-avatar" id="mapAvatar">
-      <div class="diva" id="divaAvatar" style="transform:scale(0.4); transform-origin:top center;"></div>
+      <div class="diva" id="divaAvatar" style="transform:scale(0.4); transform-origin:top left;"></div>
     </div>
     <div class="landmark" style="top:300px; right:2px;">
       <div class="kibble-tower">
@@ -1095,8 +1096,8 @@
     const path = document.getElementById('mapPath');
     path.innerHTML = '';
     const pts = NODE_COORDS.map(c => c.x+','+c.y).join(' ');
-    path.innerHTML = '<svg width="300" height="640" style="position:absolute;left:0;top:0;pointer-events:none;z-index:0;">' +
-      '<polyline points="'+pts+'" fill="none" stroke="rgba(59,42,32,0.35)" stroke-width="4" stroke-dasharray="2,11" stroke-linecap="round"/></svg>';
+    path.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="640" style="position:absolute;left:0;top:0;pointer-events:none;z-index:0;">' +
+      '<polyline points="'+pts+'" fill="none" stroke="rgba(59,42,32,0.45)" stroke-width="4" stroke-dasharray="2,11" stroke-linecap="round"/></svg>';
     const total = LEVELS.length;
     for(let i=0;i<=total;i++){
       const isBoss = i === total;
