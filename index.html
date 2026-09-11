@@ -107,6 +107,14 @@
   .goal-badge{ text-align:center; color:#fff; font-weight:700; font-size:11.5px; margin:0 auto 8px;
     background: var(--red); border:2px solid var(--ink); border-radius:16px; padding:4px 12px; max-width:220px; font-family:'Baloo 2',sans-serif; }
   .goal-badge.warn{ background:#B0463F; animation: bshake .3s ease; }
+  .timer-wrap{ display:flex; align-items:center; gap:8px; max-width:280px; margin:0 auto 10px; }
+  .timer-wrap.hidden{ display:none; }
+  .timer-bar{ flex:1; height:14px; background:#fff; border:2.5px solid var(--ink); border-radius:8px; overflow:hidden; }
+  .timer-fill{ height:100%; width:100%; background: linear-gradient(90deg, var(--green), var(--gold)); transition: width 1s linear; }
+  .timer-fill.danger{ background: linear-gradient(90deg, #B0463F, var(--red)); animation: timerPulse .4s ease-in-out infinite; }
+  @keyframes timerPulse{ 0%,100%{ opacity:1;} 50%{ opacity:.55;} }
+  .timer-text{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:14px; color:var(--ink); min-width:34px; }
+  .timer-text.danger{ color:#B0463F; animation: timerPulse .4s ease-in-out infinite; }
   .stat{ font-size:12.5px; color:var(--ink); text-align:center; margin-bottom:10px; font-weight:600; }
   .stat b{ color:var(--red); font-size:17px; }
   .stat .score{ color:var(--gold); font-size:19px; }
@@ -145,6 +153,12 @@
   @keyframes bshake{ 0%,100%{ transform:translateX(0);} 25%{ transform:translateX(-5px);} 75%{ transform:translateX(5px);} }
 
   .head{ position:absolute; width:34px; height:34px; }
+  .trophy-block{ box-shadow: 3px 5px 0 rgba(59,42,32,0.3), inset 0 5px 7px rgba(255,255,255,0.55), inset 0 -7px 9px rgba(0,0,0,0.18), 0 0 10px 2px rgba(232,184,48,0.6); }
+  .trophy-badge{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  .trophy-shine{ position:absolute; inset:0; border-radius:999px; background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.5) 0deg 14deg, transparent 14deg 28deg); opacity:.5; }
+  .trophy-star{ width:20px; height:20px; background:#fff; z-index:1;
+    clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); animation: twinkle 1.6s ease-in-out infinite; }
   .block.h .head{ right:-8px; top:50%; transform:translateY(-50%); }
   .block.v .head{ bottom:-8px; left:50%; transform:translateX(-50%) rotate(90deg); }
   .ear{ position:absolute; width:15px; height:19px; background:var(--c); filter:brightness(0.78); border-radius:50% 50% 45% 45%/60% 60% 40% 40%; top:-6px; }
@@ -452,6 +466,10 @@
     </header>
     <div class="caption">Strut each pup down the runway to their matching rosette!</div>
     <div class="goal-badge" id="goalBadge">Goal: clear in ≤5 moves</div>
+    <div class="timer-wrap hidden" id="timerWrap">
+      <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
+      <div class="timer-text" id="timerText">0:60</div>
+    </div>
     <div class="candy-strip" style="width:120px; margin:0 auto 10px;"></div>
     <div class="stat"><b class="score" id="scoreVal">0</b> pts &nbsp;•&nbsp; <b id="moveCount">0</b> moves &nbsp;•&nbsp; <button id="resetBtn" class="icon-btn" aria-label="Reset level" title="Reset level" style="display:inline-flex; vertical-align:middle; margin-left:6px;">↺</button></div>
 
@@ -519,7 +537,7 @@
 <script>
 
   const CELL = 48, GRID_W = 6, GRID_H = 6, ORIGIN = 24;
-  const COLOR_HEX = { red:'#FF5A5F', blue:'#4FB8E8', green:'#7BC96F', yellow:'#FFD447', teal:'#4FD1C1', orange:'#FFA542', purple:'#B47BE0', pink:'#FF7BAC' };
+  const COLOR_HEX = { red:'#FF5A5F', blue:'#4FB8E8', green:'#7BC96F', yellow:'#FFD447', teal:'#4FD1C1', orange:'#FFA542', purple:'#B47BE0', pink:'#FF7BAC', gold:'#E8B830' };
   const CONFETTI_PALETTE = ['#FF5A5F','#FFD447','#4FB8E8','#7BC96F','#FF7BAC','#B47BE0','#FFA542'];
 
   const buntingColors = ['#FF5A5F','#FFD447','#4FB8E8','#7BC96F','#FF7BAC','#B47BE0'];
@@ -682,9 +700,10 @@
         {id:'a',color:'purple',orient:'v',x:2,y:1,h:2},
         {id:'b',color:'teal',orient:'h',x:0,y:2,w:2},
         {id:'c',color:'orange',orient:'v',x:1,y:3,h:2},
-        {id:'d',color:'pink',orient:'h',x:4,y:4,w:1}
+        {id:'d',color:'pink',orient:'h',x:4,y:4,w:1},
+        {id:'e',color:'gold',orient:'v',x:3,y:2,h:1,trophy:true}
       ],
-      doors:[ {side:'top', lane:2, color:'purple'}, {side:'right', lane:2, color:'teal'}, {side:'top', lane:1, color:'orange'}, {side:'right', lane:4, color:'pink'} ], moveLimit:5, treats:[{x:5,y:4}] }
+      doors:[ {side:'top', lane:2, color:'purple'}, {side:'right', lane:2, color:'teal'}, {side:'top', lane:1, color:'orange'}, {side:'right', lane:4, color:'pink'}, {side:'bottom', lane:3, color:'gold'} ], moveLimit:5, treats:[{x:5,y:4}] }
   ];
 
   const BOSS_LEVEL = {
@@ -708,7 +727,7 @@
     treats:[{x:3,y:2},{x:2,y:4}]
   };
 
-  let state = { levelIndex:0, blocks:[], doors:[], initial:[], moves:0, history:[], highestUnlocked:0, score:0, combo:0, boosters:{paws:false,treat:false,double:false}, doubleActive:false, bossCompleted:false, isBoss:false };
+  let state = { levelIndex:0, blocks:[], doors:[], initial:[], moves:0, history:[], highestUnlocked:0, score:0, combo:0, boosters:{paws:false,treat:false,double:false}, doubleActive:false, bossCompleted:false, isBoss:false, bossTimeLeft:60, bossTimerInterval:null };
   let blockEls = {};
 
   function occupiesCell(b,x,y){
@@ -757,6 +776,8 @@
 
   function startLevel(){
     state.isBoss = false;
+    stopBossTimer();
+    document.getElementById('timerWrap').classList.add('hidden');
     loadPuzzle(LEVELS[state.levelIndex]);
     document.getElementById('levelSub').textContent = 'of ' + LEVELS.length;
     document.getElementById('levelNum').textContent = state.levelIndex+1;
@@ -768,6 +789,38 @@
     document.getElementById('levelSub').textContent = '';
     document.getElementById('levelNum').textContent = 'BOSS';
     document.getElementById('wordmarkGame').textContent = 'Boss Round';
+    startBossTimer(60);
+  }
+  const BOSS_TIME_TOTAL = 60;
+  function startBossTimer(seconds){
+    stopBossTimer();
+    state.bossTimeLeft = seconds;
+    document.getElementById('timerWrap').classList.remove('hidden');
+    updateTimerUI();
+    state.bossTimerInterval = setInterval(() => {
+      state.bossTimeLeft--;
+      updateTimerUI();
+      if(state.bossTimeLeft <= 10 && state.bossTimeLeft > 0) tone(880,0.08,'square',0.1,0);
+      if(state.bossTimeLeft <= 0){
+        stopBossTimer();
+        showFail();
+      }
+    }, 1000);
+  }
+  function stopBossTimer(){
+    if(state.bossTimerInterval) clearInterval(state.bossTimerInterval);
+    state.bossTimerInterval = null;
+  }
+  function updateTimerUI(){
+    const pct = Math.max(0, state.bossTimeLeft / BOSS_TIME_TOTAL * 100);
+    const fill = document.getElementById('timerFill');
+    const text = document.getElementById('timerText');
+    fill.style.width = pct + '%';
+    const m = Math.floor(Math.max(0,state.bossTimeLeft)/60), s = Math.max(0,state.bossTimeLeft)%60;
+    text.textContent = m+':'+(s<10?'0':'')+s;
+    const danger = state.bossTimeLeft <= 10;
+    fill.classList.toggle('danger', danger);
+    text.classList.toggle('danger', danger);
   }
   function loadPuzzle(cfg){
     state.blocks = cfg.blocks.map(b => ({...b}));
@@ -894,19 +947,23 @@
     const grid = document.getElementById('grid');
     state.blocks.forEach(b => {
       const el = document.createElement('div');
-      el.className = 'block ' + b.orient;
+      el.className = 'block ' + b.orient + (b.trophy ? ' trophy-block' : '');
       el.style.setProperty('--c', COLOR_HEX[b.color]);
       el.style.background = 'linear-gradient(160deg, rgba(255,255,255,.65), rgba(255,255,255,0) 45%), ' + COLOR_HEX[b.color];
       applyBlockStyle(el, b);
-      const head = document.createElement('div');
-      head.className = 'head';
-      head.innerHTML =
-        '<div class="ear l"></div><div class="ear r"></div>' +
-        '<div class="eye l"></div><div class="eye r"></div>' +
-        '<div class="nose"></div><div class="tongue"></div>';
-      const tail = document.createElement('div');
-      tail.className = 'tail';
-      el.appendChild(head); el.appendChild(tail);
+      if(b.trophy){
+        el.innerHTML = '<div class="trophy-badge"><div class="trophy-shine"></div><div class="trophy-star"></div></div>';
+      } else {
+        const head = document.createElement('div');
+        head.className = 'head';
+        head.innerHTML =
+          '<div class="ear l"></div><div class="ear r"></div>' +
+          '<div class="eye l"></div><div class="eye r"></div>' +
+          '<div class="nose"></div><div class="tongue"></div>';
+        const tail = document.createElement('div');
+        tail.className = 'tail';
+        el.appendChild(head); el.appendChild(tail);
+      }
       attachDrag(el, b);
       grid.appendChild(el);
       blockEls[b.id] = el;
@@ -1125,6 +1182,7 @@
   });
 
   function showWin(){
+    stopBossTimer();
     if(state.isBoss){
       document.getElementById('winStats').textContent = 'Boss cleared in ' + state.moves + ' moves — ' + state.score + ' pts. You are officially Best in Show!';
       state.bossCompleted = true;
@@ -1136,6 +1194,7 @@
     playWin(); spawnConfetti(); celebrateHit();
   }
   function showFail(){
+    stopBossTimer();
     tone(300,0.15,'sawtooth',0.1,0); tone(200,0.18,'sawtooth',0.1,150); tone(140,0.22,'sawtooth',0.11,300);
     document.getElementById('failOverlay').classList.remove('hidden');
   }
@@ -1237,7 +1296,7 @@
     avatar.style.left = (offsetX + NODE_COORDS[idx].x) + 'px';
     avatar.style.top = (offsetY + NODE_COORDS[idx].y - 6) + 'px';
   }
-  document.getElementById('mapBtn').addEventListener('click', showMap);
+  document.getElementById('mapBtn').addEventListener('click', () => { stopBossTimer(); showMap(); });
 
   setInterval(() => {
     const sh = document.getElementById('shimmer');
