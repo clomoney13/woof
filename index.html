@@ -341,6 +341,13 @@
   @keyframes cheerJump{ 0%,100%{ transform:translateY(0) rotate(0);} 50%{ transform:translateY(-10px) rotate(-4deg);} }
 
   .diva{ position:relative; width:100px; height:150px; margin:0 auto; }
+  .diva-instance .limb{ transform-box:fill-box; transform-origin:50% 0%; transition:transform .4s cubic-bezier(.34,1.56,.64,1); }
+  .diva-instance.pose-celebrate .arm-left{ transform:rotate(140deg); }
+  .diva-instance.pose-celebrate .arm-right{ transform:rotate(-140deg); }
+  .diva-instance.pose-walk .leg-left{ transform:rotate(-18deg); }
+  .diva-instance.pose-walk .leg-right{ transform:rotate(18deg); }
+  .diva-instance.pose-walk .arm-left{ transform:rotate(14deg); }
+  .diva-instance.pose-walk .arm-right{ transform:rotate(-14deg); }
   .diva-cup{ position:absolute; top:88px; left:6px; width:11px; height:13px; background:#fff; border:2px solid var(--ink); border-radius:1px 1px 4px 4px; z-index:5; }
   .diva-cup::before{ content:''; position:absolute; right:-6px; top:1px; width:6px; height:6px; border:2px solid var(--ink); border-radius:50%; background:transparent; border-left-color:transparent; }
   .diva-cup::after{ content:''; position:absolute; top:-5px; left:2px; width:2px; height:5px; background:rgba(139,111,78,0.5); border-radius:1px; animation: steamRise 1.6s ease-in-out infinite; }
@@ -379,6 +386,65 @@
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+  <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFE7BE"/><stop offset=".45" stop-color="#FFC9A8"/><stop offset="1" stop-color="#FF8FB3"/>
+  </linearGradient>
+  <radialGradient id="sunglow" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#FFF3D2" stop-opacity=".9"/><stop offset="1" stop-color="#FFF3D2" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="pathCream" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFF9EF"/><stop offset="1" stop-color="#FFE9C9"/>
+  </linearGradient>
+  <radialGradient id="gold" cx="35%" cy="30%" r="75%">
+    <stop offset="0" stop-color="#FFE49A"/><stop offset=".6" stop-color="#F4C15C"/><stop offset="1" stop-color="#C4881A"/>
+  </radialGradient>
+  <radialGradient id="goldMuted" cx="35%" cy="30%" r="75%">
+    <stop offset="0" stop-color="#E7D3AE"/><stop offset="1" stop-color="#B79E78"/>
+  </radialGradient>
+  <radialGradient id="goldGreen" cx="35%" cy="30%" r="75%">
+    <stop offset="0" stop-color="#D9F0B0"/><stop offset="1" stop-color="#8FC15C"/>
+  </radialGradient>
+  <g id="icon-rosette">
+    <g stroke="#8A2B12" stroke-width="1.2">
+      <ellipse cx="20" cy="19" rx="15" ry="6" fill="#E8425F" transform="rotate(0 20 19)"/>
+      <ellipse cx="20" cy="19" rx="15" ry="6" fill="#E8425F" transform="rotate(30 20 19)"/>
+      <ellipse cx="20" cy="19" rx="15" ry="6" fill="#E8425F" transform="rotate(60 20 19)"/>
+      <ellipse cx="20" cy="19" rx="15" ry="6" fill="#E8425F" transform="rotate(90 20 19)"/>
+      <ellipse cx="20" cy="19" rx="15" ry="6" fill="#E8425F" transform="rotate(120 20 19)"/>
+      <ellipse cx="20" cy="19" rx="15" ry="6" fill="#E8425F" transform="rotate(150 20 19)"/>
+    </g>
+    <polygon points="14,26 19,26 15,39 12,37" fill="#B5203D"/>
+    <polygon points="26,26 21,26 25,39 28,37" fill="#B5203D"/>
+    <circle cx="20" cy="19" r="9" fill="url(#gold)" stroke="#8A5A12" stroke-width="1"/>
+    <ellipse cx="17" cy="16" rx="2.6" ry="1.6" fill="#fff" opacity=".75"/>
+  </g>
+  <g id="icon-trophy">
+    <rect x="15" y="32" width="10" height="4" rx="1" fill="#8A5A12"/>
+    <rect x="18" y="27" width="4" height="6" fill="url(#gold)"/>
+    <path d="M11 10 h18 v9 a9 9 0 0 1 -18 0 z" fill="url(#gold)" stroke="#8A5A12" stroke-width="1"/>
+    <path d="M11 12 c-6 0 -7 9 -1 10" fill="none" stroke="#8A5A12" stroke-width="2"/>
+    <path d="M29 12 c6 0 7 9 1 10" fill="none" stroke="#8A5A12" stroke-width="2"/>
+    <ellipse cx="16" cy="14" rx="2" ry="3.4" fill="#fff" opacity=".55"/>
+  </g>
+  <g id="icon-bone">
+    <g fill="#F7F3EA" stroke="#C9BFA9" stroke-width="1">
+      <rect x="11" y="17" width="18" height="7" rx="3.5"/>
+      <circle cx="12" cy="15" r="4"/><circle cx="12" cy="24" r="4"/>
+      <circle cx="28" cy="15" r="4"/><circle cx="28" cy="24" r="4"/>
+    </g>
+    <ellipse cx="15" cy="14" rx="2.2" ry="1.3" fill="#fff" opacity=".85"/>
+  </g>
+  <g id="icon-cappuccino">
+    <ellipse cx="20" cy="32" rx="13" ry="3" fill="#E4D8C6"/>
+    <path d="M9 16 h18 v8 a9 9 0 0 1 -18 0 z" fill="#FBF6EC" stroke="#D8CBB2" stroke-width="1"/>
+    <path d="M27 18 c6 -1 7 7 0 8" fill="none" stroke="#D8CBB2" stroke-width="2"/>
+    <path d="M11 16 c3 -4 15 -4 16 0 c-4 2 -12 2 -16 0z" fill="#C9A277"/>
+    <path d="M15 15 q3 -2 5 0 q3 -2 5 0" fill="none" stroke="#fff" stroke-width="1"/>
+  </g>
+</defs>
+</svg>
 <div class="bunting" id="bunting"></div>
 <div class="bunting row2" id="bunting2"></div>
 <div class="sun"></div>
@@ -395,66 +461,14 @@
 
   <div id="mapScreen" class="screen">
     <div class="string-lights" id="stringLights"></div>
-    <div class="big-top">
-      <div class="pole"></div><div class="flag"></div>
-      <div class="canopy"></div>
-      <div class="base"></div>
-      <div class="valance"></div>
-    </div>
     <div class="map-title">Best in Show</div>
     <div class="map-sub">Tap a level to strut your pup down the runway!</div>
     <div class="mascot-wrap">
       <div class="speech-bubble" id="mascotSpeech">Let's go, pup!</div>
       <div class="mascot" id="mascotDog"></div>
     </div>
-    <div class="map-path" id="mapPath"></div>
-    <div class="map-avatar" id="mapAvatar">
-      <div class="diva" id="divaAvatar" style="transform:scale(0.4); transform-origin:top left;"></div>
-    </div>
-    <div class="landmark" style="top:80px; right:-4px;">
-      <div class="ferris-wheel">
-        <div class="rim"></div><div class="hub"></div>
-        <div class="spoke" style="transform:rotate(0deg);"></div>
-        <div class="spoke" style="transform:rotate(60deg);"></div>
-        <div class="spoke" style="transform:rotate(120deg);"></div>
-        <div class="spoke" style="transform:rotate(180deg);"></div>
-        <div class="spoke" style="transform:rotate(240deg);"></div>
-        <div class="spoke" style="transform:rotate(300deg);"></div>
-        <div class="gondola" style="left:78px; top:39px; background:var(--red);"></div>
-        <div class="gondola" style="left:60px; top:74px; background:var(--blue);"></div>
-        <div class="gondola" style="left:16px; top:74px; background:var(--yellow);"></div>
-        <div class="gondola" style="left:-2px; top:39px; background:var(--green);"></div>
-        <div class="gondola" style="left:16px; top:4px; background:var(--pink);"></div>
-        <div class="gondola" style="left:60px; top:4px; background:var(--purple);"></div>
-      </div>
-      <div class="ferris-stand"></div>
-      <div class="landmark-label">The Big Wheel</div>
-    </div>
-    <div class="landmark" style="top:300px; right:2px;">
-      <div class="kibble-tower">
-        <div class="biscuit" style="top:0;"></div>
-        <div class="biscuit" style="top:13px; left:2px;"></div>
-        <div class="biscuit" style="top:26px; left:4px;"></div>
-        <div class="biscuit" style="top:39px; left:6px;"></div>
-        <div class="biscuit" style="top:52px; left:8px;"></div>
-      </div>
-      <div class="landmark-label">Leaning Tower<br>of Kibble</div>
-    </div>
-    <div class="landmark" style="top:440px; left:-2px;">
-      <div class="popcorn-cart">
-        <div class="awning"></div><div class="box"></div>
-        <div class="wheel l"></div><div class="wheel r"></div>
-      </div>
-      <div class="landmark-label">Popcorn!</div>
-    </div>
-    <div class="landmark" style="top:560px; left:2px;">
-      <div class="woof-tower">
-        <div class="wbone"></div>
-        <div class="wtop"></div>
-        <div class="wmid"></div>
-        <div class="wbase"></div>
-      </div>
-      <div class="landmark-label">The Woof Tower</div>
+    <div class="map-path" id="mapPath">
+      <svg id="mapSvg" width="300" height="640" viewBox="0 0 300 640" style="position:absolute;left:0;top:0;overflow:visible;"></svg>
     </div>
   </div>
 
@@ -482,7 +496,7 @@
       </div>
       <div class="booster-item" id="boosterTreat">
         <div class="booster-circle" style="background:linear-gradient(160deg, rgba(255,255,255,.5), rgba(255,255,255,0) 45%), #D9A85C;">
-          <div class="mini-bone-icon"></div>
+          <svg viewBox="0 0 40 40" style="width:26px;height:26px;"><use href="#icon-bone"/></svg>
         </div>
         <div class="booster-label">Treat<br>Toss</div>
       </div>
@@ -573,30 +587,9 @@
       '<div class="mascot-eye l"></div><div class="mascot-eye r"></div>' +
       '<div class="mascot-nose"></div><div class="mascot-tongue"></div>';
   }
-  function divaHTML(){
-    let boaPuffs = '';
-    const offsets = [[0,4],[12,0],[24,3],[36,0],[48,3],[58,9]];
-    offsets.forEach(o => { boaPuffs += '<div class="puff" style="left:'+o[0]+'px; top:'+o[1]+'px;"></div>'; });
-    return '<div class="diva-shoe l"></div><div class="diva-shoe r"></div>' +
-      '<div class="diva-leg l"></div><div class="diva-leg r"></div>' +
-      '<div class="diva-arm l"></div><div class="diva-cup"></div><div class="diva-arm r"></div>' +
-      '<div class="diva-body"></div>' +
-      '<div class="diva-boa">'+boaPuffs+'</div>' +
-      '<div class="diva-earring l"></div><div class="diva-earring r"></div>' +
-      '<div class="diva-head">' +
-        '<div class="diva-hair"></div>' +
-        '<div class="diva-brow"></div>' +
-        '<div class="diva-glasses"><div class="lens"></div><div class="lens"></div></div>' +
-        '<div class="diva-lips"></div>' +
-      '</div>';
-  }
   ['mascotDog','mascotWin'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.innerHTML = dogHTML();
-  });
-  ['divaAvatar'].forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.innerHTML = divaHTML();
   });
 
   const bulbColors = ['#FFD447','#FF5A5F','#4FB8E8','#7BC96F','#FF7BAC'];
@@ -882,7 +875,7 @@
       el.className = 'treat-prop';
       el.style.left = (t.x*CELL + (CELL-22)/2) + 'px';
       el.style.top = (t.y*CELL + (CELL-22)/2) + 'px';
-      el.innerHTML = '<div class="bone-shape"></div>';
+      el.innerHTML = '<svg viewBox="0 0 40 40" style="width:100%;height:100%;"><use href="#icon-bone"/></svg>';
       grid.appendChild(el);
       treatEls[idx] = el;
     });
@@ -952,7 +945,7 @@
       el.style.background = 'linear-gradient(160deg, rgba(255,255,255,.65), rgba(255,255,255,0) 45%), ' + COLOR_HEX[b.color];
       applyBlockStyle(el, b);
       if(b.trophy){
-        el.innerHTML = '<div class="trophy-badge"><div class="trophy-shine"></div><div class="trophy-star"></div></div>';
+        el.innerHTML = '<div class="trophy-badge"><svg viewBox="0 0 40 40" style="width:70%;height:70%;"><use href="#icon-trophy"/></svg></div>';
       } else {
         const head = document.createElement('div');
         head.className = 'head';
@@ -1227,74 +1220,123 @@
   const NODE_COORDS = [
     {x:160, y:30}, {x:80, y:150}, {x:230, y:270}, {x:70, y:390}, {x:200, y:510}, {x:150, y:615}
   ];
+
+  const DIVA_SVG =
+    '<ellipse cx="70" cy="205" rx="22" ry="6" fill="#000" opacity=".14"/>' +
+    '<g class="limb leg-left"><polygon points="48,150 67,150 71,190 55,197 45,160" fill="#2B1B4A" stroke="#2B1B14" stroke-width="3.5" stroke-linejoin="round"/><polygon points="47,189 73,189 69,200 44,199" fill="#181028" stroke="#2B1B14" stroke-width="3.5" stroke-linejoin="round"/></g>' +
+    '<g class="limb leg-right"><polygon points="75,148 93,152 97,192 82,198 73,158" fill="#C98A2E" stroke="#2B1B14" stroke-width="3.5" stroke-linejoin="round"/><polygon points="76,190 100,193 96,203 72,199" fill="#8A5A12" stroke="#2B1B14" stroke-width="3.5" stroke-linejoin="round"/></g>' +
+    '<polygon points="40,74 100,68 110,150 34,157" fill="#E8447A" stroke="#2B1B14" stroke-width="4" stroke-linejoin="round"/>' +
+    '<polygon points="40,74 70,92 54,151 34,157" fill="#A82142" stroke="#2B1B14" stroke-width="3.5" stroke-linejoin="round"/>' +
+    '<polygon points="70,66 101,70 91,102 64,97" fill="#E3A83D" stroke="#2B1B14" stroke-width="3.5" stroke-linejoin="round"/>' +
+    '<polygon points="58,138 110,150 96,160 56,155" fill="#2E8F86" stroke="#2B1B14" stroke-width="3" stroke-linejoin="round"/>' +
+    '<g class="limb arm-left"><polygon points="34,76 51,80 47,120 29,117" fill="#2B1B4A" stroke="#2B1B14" stroke-width="3.5" stroke-linejoin="round"/><polygon points="27,117 47,120 41,135 22,130" fill="#F2C79A" stroke="#2B1B14" stroke-width="3" stroke-linejoin="round"/></g>' +
+    '<g class="limb arm-right"><polygon points="97,74 114,70 110,104 92,108" fill="#A82142" stroke="#2B1B14" stroke-width="3.5" stroke-linejoin="round"/><polygon points="92,108 110,104 121,85 101,83" fill="#E8447A" stroke="#2B1B14" stroke-width="3.5" stroke-linejoin="round"/><polygon points="112,89 128,82 124,98 109,101" fill="#F2C79A" stroke="#2B1B14" stroke-width="3" stroke-linejoin="round"/>' +
+      '<g transform="translate(126,76)"><path d="M-7 0 h13 v8 a6.5 6.5 0 0 1 -13 0z" fill="#FBF6EC" stroke="#2B1B14" stroke-width="2"/><path d="M6 1 c6 -1 6 6 0 7" fill="none" stroke="#2B1B14" stroke-width="1.8"/><path d="M-4 -3 q3 -3 6 0 q3 -3 6 0" fill="none" stroke="#fff" stroke-width="1.2" opacity=".8"/></g></g>' +
+    '<g fill="#FF9FC7" stroke="#D9679E" stroke-width="1"><circle cx="38" cy="74" r="8"/><circle cx="50" cy="68" r="8"/><circle cx="63" cy="65" r="8"/><circle cx="77" cy="65" r="8"/><circle cx="90" cy="68" r="8"/><circle cx="101" cy="75" r="8"/></g>' +
+    '<polygon points="24,17 58,2 49,45" fill="#5A2E9E" stroke="#2B1B14" stroke-width="3" stroke-linejoin="round"/>' +
+    '<polygon points="49,-2 86,9 65,40" fill="#7C4FCC" stroke="#2B1B14" stroke-width="3" stroke-linejoin="round"/>' +
+    '<polygon points="86,4 112,24 75,42" fill="#5A2E9E" stroke="#2B1B14" stroke-width="3" stroke-linejoin="round"/>' +
+    '<polygon points="38,44 41,17 68,13 69,77 39,71" fill="#F2C79A" stroke="#2B1B14" stroke-width="4" stroke-linejoin="round"/>' +
+    '<polygon points="68,13 99,20 102,52 90,76 68,77" fill="#C9A0C0" stroke="#2B1B14" stroke-width="4" stroke-linejoin="round"/>' +
+    '<polygon points="73,49 84,57 68,63" fill="#D9A876" stroke="#2B1B14" stroke-width="2"/>' +
+    '<polygon points="43,55 62,63 41,69" fill="#D81E3E" stroke="#2B1B14" stroke-width="2" stroke-linejoin="round"/>' +
+    '<ellipse cx="52" cy="39" rx="16" ry="11" fill="#fff" stroke="#2B1B14" stroke-width="2.5"/>' +
+    '<circle cx="49" cy="40" r="5.5" fill="#181018"/><circle cx="47.3" cy="38" r="1.6" fill="#fff"/><circle cx="91" cy="55" r="4.2" fill="#181018"/>' +
+    '<g transform="rotate(-9 55 42)"><polygon points="33,32 60,23 78,33 72,54 40,58" fill="#1B1420" stroke="#D4AF6A" stroke-width="3" stroke-linejoin="round"/><polygon points="60,23 78,33 68,42 54,35" fill="#2E2438" stroke="#D4AF6A" stroke-width="1.5" stroke-linejoin="round"/><path d="M40,31 L52,27" stroke="#fff" stroke-width="2.2" opacity=".55" stroke-linecap="round"/><path d="M78,33 L98,27" stroke="#D4AF6A" stroke-width="2.5" stroke-linecap="round"/></g>' +
+    '<circle cx="94" cy="62" r="5" fill="none" stroke="#F4C15C" stroke-width="2.4"/><line x1="94" y1="57" x2="94" y2="59" stroke="#C4881A" stroke-width="2"/>';
+
   function renderMap(){
-    const path = document.getElementById('mapPath');
-    path.innerHTML = '';
-    const pts = NODE_COORDS.map(c => c.x+','+c.y).join(' ');
-    path.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="640" style="position:absolute;left:0;top:0;pointer-events:none;z-index:0;">' +
-      '<defs><pattern id="candyStripe" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
-      '<rect width="14" height="14" fill="#FFD9E8"/><rect width="7" height="14" fill="#fff"/></pattern></defs>' +
-      '<polyline points="'+pts+'" fill="none" stroke="#C9A57C" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '<polyline points="'+pts+'" fill="none" stroke="#E3C398" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '<polyline points="'+pts+'" fill="none" stroke="url(#candyStripe)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const svg = document.getElementById('mapSvg');
     const total = LEVELS.length;
+    const pts = NODE_COORDS.map(c => c.x+','+c.y).join(' ');
+
+    let html = '';
+    html += '<rect x="0" y="0" width="300" height="640" fill="url(#skyGrad)"/>';
+    html += '<circle cx="150" cy="90" r="90" fill="url(#sunglow)"/>';
+    html += '<g fill="#fff" opacity=".55"><ellipse cx="45" cy="140" rx="20" ry="7"/><ellipse cx="255" cy="220" rx="22" ry="8"/><ellipse cx="60" cy="480" rx="18" ry="6"/></g>';
+
+    // Woof Tower (top right)
+    html += '<g transform="translate(210,20) scale(.42)"><g stroke="#5A2E9E" stroke-width="4" fill="none" stroke-linecap="round">' +
+      '<path d="M0 210 L-46 210 L-8 20 L8 20 L46 210 Z" fill="#EDE1FB" stroke="#5A2E9E"/>' +
+      '<line x1="-30" y1="170" x2="30" y2="170"/><line x1="-24" y1="130" x2="24" y2="130"/><line x1="-18" y1="95" x2="18" y2="95"/>' +
+      '<line x1="-46" y1="210" x2="8" y2="20" stroke-width="2"/><line x1="46" y1="210" x2="-8" y2="20" stroke-width="2"/></g>' +
+      '<g transform="translate(0,16)"><rect x="-4" y="0" width="8" height="16" fill="#8A5A12"/><circle cx="-9" cy="-4" r="7" fill="url(#gold)" stroke="#8A5A12" stroke-width="1.5"/><circle cx="9" cy="-4" r="7" fill="url(#gold)" stroke="#8A5A12" stroke-width="1.5"/><rect x="-9" y="-6" width="18" height="4" rx="2" fill="url(#gold)" stroke="#8A5A12" stroke-width="1"/></g></g>' +
+      '<text x="230" y="118" text-anchor="middle" font-size="10" font-weight="700" fill="#5A2E9E">Woof Tower</text>';
+
+    // Big top tent (left, upper)
+    html += '<g transform="translate(40,150) scale(.4)">' +
+      '<path d="M-80 100 L0 -30 L80 100 Z" fill="#FFF4E3" stroke="#2B1B14" stroke-width="4"/>' +
+      '<path d="M-53 100 L-16 -12 L20 100 Z" fill="#E8425F" stroke="#2B1B14" stroke-width="3"/>' +
+      '<path d="M20 100 L44 26 L76 100 Z" fill="#E8425F" stroke="#2B1B14" stroke-width="3"/>' +
+      '<rect x="-90" y="98" width="180" height="14" rx="4" fill="#FFF4E3" stroke="#2B1B14" stroke-width="3"/>' +
+      '<polygon points="0,-30 -6,-46 6,-46" fill="#F4C15C"/><line x1="0" y1="-30" x2="0" y2="-46" stroke="#2B1B14" stroke-width="2"/></g>';
+
+    // Ferris wheel (right, mid)
+    html += '<g transform="translate(250,320) scale(.32)">' +
+      '<line x1="0" y1="0" x2="-30" y2="90" stroke="#2B1B14" stroke-width="5"/><line x1="0" y1="0" x2="30" y2="90" stroke="#2B1B14" stroke-width="5"/>' +
+      '<circle cx="0" cy="0" r="74" fill="none" stroke="#2B1B14" stroke-width="6"/>' +
+      '<g stroke="#2B1B14" stroke-width="3"><line x1="0" y1="0" x2="0" y2="-74"/><line x1="0" y1="0" x2="0" y2="74"/><line x1="0" y1="0" x2="-64" y2="-37"/><line x1="0" y1="0" x2="64" y2="37"/><line x1="0" y1="0" x2="64" y2="-37"/><line x1="0" y1="0" x2="-64" y2="37"/><line x1="0" y1="0" x2="-52" y2="52"/><line x1="0" y1="0" x2="52" y2="-52"/></g>' +
+      '<circle cx="0" cy="0" r="9" fill="url(#gold)" stroke="#2B1B14" stroke-width="2"/>' +
+      '<g stroke="#2B1B14" stroke-width="2"><rect x="-9" y="-84" width="18" height="14" rx="4" fill="#7BC8E0"/><rect x="-9" y="70" width="18" height="14" rx="4" fill="#FF9FC7"/><rect x="55" y="-47" width="18" height="14" rx="4" fill="#F4C15C" transform="rotate(30 64 -40)"/><rect x="-73" y="27" width="18" height="14" rx="4" fill="#8FD17A" transform="rotate(30 -64 34)"/><rect x="55" y="27" width="18" height="14" rx="4" fill="#FF9FC7" transform="rotate(-30 64 34)"/><rect x="-73" y="-47" width="18" height="14" rx="4" fill="#7BC8E0" transform="rotate(-30 -64 -40)"/></g></g>' +
+      '<text x="250" y="365" text-anchor="middle" font-size="10" font-weight="700" fill="#2B1B14">Ferris Wheel</text>';
+
+    // Leaning Tower of Kibble (left, lower)
+    html += '<g transform="translate(35,450) scale(.32)">' +
+      '<g stroke="#2B1B14" stroke-width="3"><rect x="-46" y="60" width="92" height="26" rx="8" fill="#E8C07D" transform="rotate(2)"/><rect x="-40" y="34" width="80" height="26" rx="8" fill="#EFCB8E" transform="rotate(4)"/><rect x="-34" y="8" width="68" height="26" rx="8" fill="#E8C07D" transform="rotate(6)"/><rect x="-28" y="-18" width="56" height="26" rx="8" fill="#EFCB8E" transform="rotate(8)"/><rect x="-22" y="-44" width="44" height="26" rx="8" fill="#E8C07D" transform="rotate(10)"/></g>' +
+      '<g transform="translate(4,-58) rotate(10)"><polygon points="0,-14 4,-2 16,-2 6,5 10,17 0,10 -10,17 -6,5 -16,-2 -4,-2" fill="url(#gold)" stroke="#8A5A12" stroke-width="1"/></g></g>' +
+      '<text x="35" y="490" text-anchor="middle" font-size="9" font-weight="700" fill="#2B1B14">Kibble Tower</text>';
+
+    // Popcorn cart (right, lower)
+    html += '<g transform="translate(250,565) scale(.34)">' +
+      '<g fill="#F7F3EA"><circle cx="-9" cy="6" r="8"/><circle cx="7" cy="8" r="7"/><circle cx="20" cy="4" r="8"/><circle cx="0" cy="-3" r="9"/></g>' +
+      '<path d="M-32 10 L32 10 L24 46 L-24 46 Z" fill="#E8425F" stroke="#2B1B14" stroke-width="3"/>' +
+      '<path d="M-28 18 L28 18" stroke="#FFF4E3" stroke-width="6"/><path d="M-25 30 L25 30" stroke="#FFF4E3" stroke-width="6"/>' +
+      '<circle cx="-16" cy="50" r="6" fill="#2B1B14"/><circle cx="16" cy="50" r="6" fill="#2B1B14"/>' +
+      '<path d="M-36 10 l6 -14 h60 l6 14 z" fill="#FFF4E3" stroke="#2B1B14" stroke-width="3"/></g>' +
+      '<text x="250" y="600" text-anchor="middle" font-size="9" font-weight="700" fill="#2B1B14">Popcorn Cart</text>';
+
+    // candy path
+    html += '<polyline points="'+pts+'" fill="none" stroke="#C9A57C" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>';
+    html += '<polyline points="'+pts+'" fill="none" stroke="url(#pathCream)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>';
+    html += '<polyline points="'+pts+'" fill="none" stroke="#E8425F" stroke-width="9" stroke-dasharray="8 9" stroke-linecap="round"/>';
+
+    // nodes
     for(let i=0;i<=total;i++){
       const isBoss = i === total;
-      const node = document.createElement('div');
-      let cls = 'map-node ';
-      let unlocked;
-      if(isBoss){
-        unlocked = state.highestUnlocked >= total;
-        if(state.bossCompleted) cls += 'completed';
-        else if(unlocked) cls += 'current';
-        else cls += 'locked';
-      } else {
-        unlocked = i <= state.highestUnlocked;
-        if(i < state.highestUnlocked) cls += 'completed';
-        else if(i === state.highestUnlocked) cls += 'current';
-        else cls += 'locked';
-      }
-      node.className = cls;
-      node.tabIndex = unlocked ? 0 : -1;
-      node.style.left = NODE_COORDS[i].x+'px';
-      node.style.top = NODE_COORDS[i].y+'px';
-      const medallion = document.createElement('div');
-      medallion.className = 'medallion' + (isBoss ? ' boss-medallion' : '');
-      const done = isBoss ? state.bossCompleted : i < state.highestUnlocked;
-      const current = isBoss ? (unlocked && !state.bossCompleted) : i === state.highestUnlocked;
-      if(done){
-        medallion.innerHTML = '<div class="trophy"></div>';
-      } else if(current){
-        medallion.textContent = isBoss ? 'B' : (i+1);
-      } else {
-        medallion.innerHTML = '<div class="lock-icon"><div class="lock-shackle"></div><div class="lock-body"></div></div>';
-      }
-      const label = document.createElement('div');
-      label.className='node-label'; label.textContent = isBoss ? 'Boss' : 'Level '+(i+1);
-      node.appendChild(medallion); node.appendChild(label);
-      if(unlocked){
-        node.addEventListener('click', () => {
-          if(isBoss) startBossPuzzle(); else { state.levelIndex = i; startLevel(); }
-        });
-      }
-      path.appendChild(node);
+      const x = NODE_COORDS[i].x, y = NODE_COORDS[i].y;
+      let done, current;
+      if(isBoss){ done = state.bossCompleted; current = (state.highestUnlocked >= total) && !state.bossCompleted; }
+      else { done = i < state.highestUnlocked; current = i === state.highestUnlocked; }
+      const unlocked = isBoss ? state.highestUnlocked >= total : i <= state.highestUnlocked;
+      const r = isBoss ? 34 : 26;
+      let fill = done ? 'url(#goldGreen)' : current ? 'url(#gold)' : 'url(#goldMuted)';
+      let inner;
+      if(done){ inner = '<text y="7" text-anchor="middle" font-size="'+(r*0.85)+'" fill="#fff">\u2605</text>'; }
+      else if(current && isBoss){ inner = '<use href="#icon-trophy" x="-16" y="-18" width="32" height="32"/>'; }
+      else if(current){ inner = '<text y="8" text-anchor="middle" font-size="22" font-weight="800" fill="#2B1B14">'+(i+1)+'</text>'; }
+      else { inner = '<path d="M-6 2h12v7a6 6 0 0 1-12 0z" fill="#5A4C36"/><path d="M-4 2v-3a4 4 0 0 1 8 0v3" fill="none" stroke="#5A4C36" stroke-width="2.5"/>'; }
+      const pulse = current ? '<circle r="'+r+'" fill="none" stroke="#F4C15C" stroke-width="4" opacity=".6"><animate attributeName="r" values="'+r+';'+(r+16)+'" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0" dur="1.8s" repeatCount="indefinite"/></circle>' : '';
+      html += '<g class="node-group" data-idx="'+i+'" data-boss="'+isBoss+'" data-unlocked="'+unlocked+'" tabindex="'+(unlocked?0:-1)+'" style="cursor:'+(unlocked?'pointer':'default')+'" transform="translate('+x+','+y+')">' + pulse +
+        '<circle r="'+r+'" fill="'+fill+'" stroke="#8A5A12" stroke-width="3.5"/>' + inner + '</g>';
+      if(!isBoss) html += '<text x="'+x+'" y="'+(y+r+13)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#2B1B14">Level '+(i+1)+'</text>';
+      else html += '<text x="'+x+'" y="'+(y+r+13)+'" text-anchor="middle" font-size="10" font-weight="800" fill="#8A5A12">BEST IN SHOW</text>';
     }
-    positionAvatar();
-  }
 
-  function positionAvatar(){
-    const avatar = document.getElementById('mapAvatar');
-    if(!avatar) return;
-    const total = LEVELS.length;
-    const idx = Math.min(state.highestUnlocked, total);
-    const pathEl = document.getElementById('mapPath');
-    const pathRect = pathEl.getBoundingClientRect();
-    const screenRect = document.getElementById('mapScreen').getBoundingClientRect();
-    const offsetX = pathRect.left - screenRect.left;
-    const offsetY = pathRect.top - screenRect.top;
-    avatar.style.display = '';
-    avatar.style.left = (offsetX + NODE_COORDS[idx].x) + 'px';
-    avatar.style.top = (offsetY + NODE_COORDS[idx].y - 6) + 'px';
+    // diva, positioned directly at the current node's coordinate
+    const divaIdx = Math.min(state.highestUnlocked, total);
+    const dx = NODE_COORDS[divaIdx].x, dy = NODE_COORDS[divaIdx].y;
+    const divaPose = state.bossCompleted ? 'pose-celebrate' : '';
+    html += '<g class="diva-instance '+divaPose+'" transform="translate('+(dx-30)+','+(dy-92)+') scale(.45)">' + DIVA_SVG + '</g>';
+
+    svg.innerHTML = html;
+
+    svg.querySelectorAll('.node-group').forEach(g => {
+      if(g.dataset.unlocked !== 'true') return;
+      const i = parseInt(g.dataset.idx,10);
+      const isBoss = g.dataset.boss === 'true';
+      g.addEventListener('click', () => { if(isBoss) startBossPuzzle(); else { state.levelIndex = i; startLevel(); } });
+      g.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(isBoss) startBossPuzzle(); else { state.levelIndex = i; startLevel(); } } });
+    });
   }
   document.getElementById('mapBtn').addEventListener('click', () => { stopBossTimer(); showMap(); });
 
