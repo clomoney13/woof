@@ -14,7 +14,7 @@
     --red:#FF5A5F; --yellow:#FFD447; --blue:#4FB8E8; --green:#7BC96F; --pink:#FF7BAC; --purple:#B47BE0; --orange:#FFA542;
   }
   *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
-  html,body{ height:100%; margin:0; overflow-x:hidden; }
+  html,body{ height:100%; margin:0; overflow-x:hidden; overflow-y:auto; -webkit-overflow-scrolling:touch; }
   body{
     background: linear-gradient(var(--sky-top), var(--sky-bot) 55%, var(--grass) 55%, #C99458 100%);
     color:var(--text); font-family:'Poppins', system-ui, sans-serif;
@@ -61,7 +61,7 @@
   .screen.hidden{ display:none; }
   #mapScreen{ align-items:center; text-align:center; position:relative;
     background: radial-gradient(120% 70% at 50% -10%, #FFD9A0 0%, #FFB088 35%, #E888A8 65%, #B888D8 100%);
-    margin:-34px -16px 0; padding:34px 16px 20px; border-radius:0 0 30px 30px; overflow:hidden; }
+    margin:-34px -16px 0; padding:34px 16px 20px; border-radius:0 0 30px 30px; }
   .string-lights{ position:absolute; top:0; left:0; right:0; height:34px; z-index:3; pointer-events:none; }
   .big-top{ position:absolute; bottom:0; left:-32px; width:140px; z-index:0; pointer-events:none; }
   .big-top .pole{ position:absolute; top:-14px; left:67px; width:3px; height:16px; background:var(--ink); }
