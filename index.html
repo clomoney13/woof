@@ -140,18 +140,18 @@
     border-radius:6px 6px 0 0; border:2px solid var(--ink); border-bottom:none;
   }
   .block{
-    position:absolute; border-radius:999px; touch-action:none; cursor:grab;
-    border: 3px solid var(--ink);
-    box-shadow: 3px 5px 0 rgba(59,42,32,0.3), inset 0 5px 7px rgba(255,255,255,0.55), inset 0 -7px 9px rgba(0,0,0,0.18);
+    position:absolute; touch-action:none; cursor:grab;
   }
   .block:active{ cursor:grabbing; }
   .block.dragging{ transition:none; z-index:5; transform: scale(1.08) !important; }
   .block.shake{ animation: bshake .26s ease; }
   .block:not(.dragging){ transition: left .24s cubic-bezier(.34,1.56,.64,1), top .24s cubic-bezier(.34,1.56,.64,1), transform .18s ease; }
   @keyframes bshake{ 0%,100%{ transform:translateX(0);} 25%{ transform:translateX(-5px);} 75%{ transform:translateX(5px);} }
+  .dog-block svg{ filter: drop-shadow(2px 4px 0 rgba(59,42,32,0.25)); }
 
   .head{ position:absolute; width:34px; height:34px; }
-  .trophy-block{ box-shadow: 3px 5px 0 rgba(59,42,32,0.3), inset 0 5px 7px rgba(255,255,255,0.55), inset 0 -7px 9px rgba(0,0,0,0.18), 0 0 10px 2px rgba(232,184,48,0.6); }
+  .trophy-block{ border-radius:999px; border: 3px solid var(--ink);
+    box-shadow: 3px 5px 0 rgba(59,42,32,0.3), inset 0 5px 7px rgba(255,255,255,0.55), inset 0 -7px 9px rgba(0,0,0,0.18), 0 0 10px 2px rgba(232,184,48,0.6); }
   .trophy-badge{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
   .trophy-shine{ position:absolute; inset:0; border-radius:999px; background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.5) 0deg 14deg, transparent 14deg 28deg); opacity:.5; }
   .trophy-star{ width:20px; height:20px; background:#fff; z-index:1;
@@ -591,6 +591,41 @@
 
   const CELL = 48, GRID_W = 6, GRID_H = 6, ORIGIN = 24;
   const COLOR_HEX = { red:'#FF5A5F', blue:'#4FB8E8', green:'#7BC96F', yellow:'#FFD447', teal:'#4FD1C1', orange:'#FFA542', purple:'#B47BE0', pink:'#FF7BAC', gold:'#E8B830' };
+
+  const DOG_BODY_PATHS = {
+    short:  { tx:125, vb:'82 3 242 152',  d:'M0 45 C-8 25 2 6 25 4 C38.5 -8.0 56.5 -8.0 70 4 C86 8 95 20 95 40 C95 58 85 72 70 70 C56.5 75.6 38.5 75.6 25 70 C8 68 -8 63 0 45 Z' },
+    medium: { tx:50,  vb:'7 3 317 152',   d:'M0 45 C-8 25 2 6 25 4 C61.0 -11.4 109.0 -11.4 145 4 C161 8 170 20 170 40 C170 58 160 72 145 70 C109.0 78.2 61.0 78.2 25 70 C8 68 -8 63 0 45 Z' },
+    long:   { tx:-60, vb:'-103 3 427 152', d:'M0 45 C-8 25 2 6 25 4 C94.0 -16.4 186.0 -16.4 255 4 C271 8 280 20 280 40 C280 58 270 72 255 70 C186.0 82.0 94.0 82.0 25 70 C8 68 -8 63 0 45 Z' }
+  };
+  function dogFrontLegs(c){
+    return '<g fill="'+c+'" stroke="#241812" stroke-width="6" stroke-linejoin="round">' +
+      '<g transform="translate(178,96)"><path d="M0 0 L20 0 C22 0 22 4 22 8 L22 34 C22 44 16 50 11 50 C6 50 0 44 0 34 Z"/></g>' +
+      '<g transform="translate(206,99)"><path d="M0 0 L20 0 C22 0 22 4 22 8 L22 32 C22 42 16 48 11 48 C6 48 0 42 0 32 Z"/></g></g>';
+  }
+  function dogHead(c){
+    return '<g transform="translate(178,10)">' +
+      '<path d="M18 12 C-15 18 -38 45 -32 75 C-28 95 0 96 8 80 C14 66 16 35 18 12 Z" fill="'+c+'" stroke="#241812" stroke-width="6" stroke-linejoin="round"/>' +
+      '<path d="M5 75 C-3 55 -2 30 14 16 C28 4 55 -2 78 4 C96 8 108 16 118 28 C128 38 136 48 138 58 C140 66 138 74 130 78 C122 82 112 80 106 74 C98 68 88 66 76 68 C60 70 44 66 30 70 C18 73 9 74 5 75 Z" fill="'+c+'" stroke="#241812" stroke-width="7" stroke-linejoin="round"/>' +
+      '<circle cx="130" cy="58" r="7" fill="#241812"/><circle cx="56" cy="34" r="6" fill="#241812"/><circle cx="53.5" cy="31.5" r="2" fill="#fff"/>' +
+      '<path d="M80 68 Q92 78 106 70" fill="none" stroke="#241812" stroke-width="4" stroke-linecap="round"/>' +
+      '<path d="M90 74 q2 14 14 12 q-2 -10 -4 -14 Z" fill="#F5859E" stroke="#241812" stroke-width="3.5" stroke-linejoin="round"/></g>';
+  }
+  function dogBack(c, tx){
+    return '<g transform="translate('+tx+',0)">' +
+      '<g transform="translate(-2,96)" fill="'+c+'" stroke="#241812" stroke-width="6" stroke-linejoin="round"><path d="M0 0 L20 0 C22 0 22 4 22 8 L22 34 C22 44 16 50 11 50 C6 50 0 44 0 34 Z"/></g>' +
+      '<g transform="translate(26,99)" fill="'+c+'" stroke="#241812" stroke-width="6" stroke-linejoin="round"><path d="M0 0 L20 0 C22 0 22 4 22 8 L22 32 C22 42 16 48 11 48 C6 48 0 42 0 32 Z"/></g>' +
+      '<g transform="translate(2,48)"><path d="M0 30 C-26 20 -40 36 -36 54 C-32 70 -8 68 0 54 C6 44 6 36 0 30 Z" fill="'+c+'" stroke="#241812" stroke-width="6" stroke-linejoin="round"/></g></g>';
+  }
+  function dogSVGMarkup(lengthKey, color){
+    const b = DOG_BODY_PATHS[lengthKey];
+    const body = '<g transform="translate('+b.tx+',38)"><path d="'+b.d+'" fill="'+color+'" stroke="#241812" stroke-width="7" stroke-linejoin="round"/></g>';
+    return dogBack(color, b.tx) + body + dogFrontLegs(color) + dogHead(color);
+  }
+  function dogLengthKey(b){
+    const len = b.orient==='h' ? b.w : b.h;
+    return len===1 ? 'short' : len===3 ? 'long' : 'medium';
+  }
+
   const CONFETTI_PALETTE = ['#FF5A5F','#FFD447','#4FB8E8','#7BC96F','#FF7BAC','#B47BE0','#FFA542'];
 
   const starColors = ['#FFD447','#fff','#FF7BAC'];
@@ -988,22 +1023,23 @@
     const grid = document.getElementById('grid');
     state.blocks.forEach(b => {
       const el = document.createElement('div');
-      el.className = 'block ' + b.orient + (b.trophy ? ' trophy-block' : '');
+      el.className = 'block ' + b.orient + (b.trophy ? ' trophy-block' : ' dog-block');
       el.style.setProperty('--c', COLOR_HEX[b.color]);
-      el.style.background = 'linear-gradient(160deg, rgba(255,255,255,.65), rgba(255,255,255,0) 45%), ' + COLOR_HEX[b.color];
       applyBlockStyle(el, b);
       if(b.trophy){
+        el.style.background = 'linear-gradient(160deg, rgba(255,255,255,.65), rgba(255,255,255,0) 45%), ' + COLOR_HEX[b.color];
         el.innerHTML = '<div class="trophy-badge"><svg viewBox="0 0 40 40" style="width:70%;height:70%;"><use href="#icon-trophy"/></svg></div>';
       } else {
-        const head = document.createElement('div');
-        head.className = 'head';
-        head.innerHTML =
-          '<div class="ear l"></div><div class="ear r"></div>' +
-          '<div class="eye l"></div><div class="eye r"></div>' +
-          '<div class="nose"></div><div class="tongue"></div>';
-        const tail = document.createElement('div');
-        tail.className = 'tail';
-        el.appendChild(head); el.appendChild(tail);
+        const key = dogLengthKey(b);
+        const vb = DOG_BODY_PATHS[key].vb;
+        const inner = dogSVGMarkup(key, COLOR_HEX[b.color]);
+        if(b.orient==='v'){
+          const longPx = b.h*CELL-6, shortPx = CELL-6;
+          el.innerHTML = '<svg viewBox="'+vb+'" preserveAspectRatio="xMidYMid meet" ' +
+            'style="width:'+longPx+'px;height:'+shortPx+'px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(90deg);">' + inner + '</svg>';
+        } else {
+          el.innerHTML = '<svg viewBox="'+vb+'" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;">' + inner + '</svg>';
+        }
       }
       attachDrag(el, b);
       grid.appendChild(el);
