@@ -189,6 +189,7 @@
   @keyframes popFloat{ 0%{ transform:translate(-50%,-50%) scale(0.5); opacity:0; } 25%{ transform:translate(-50%,-95%) scale(1.2); opacity:1;} 100%{ transform:translate(-50%,-170%) scale(1); opacity:0; } }
 
   footer{ display:flex; gap:7px; margin-top:auto; }
+  .hidden{ display:none !important; }
   .action-btn.hidden{ display:none; }
   .action-btn{
     flex:1; padding:12px 6px; border-radius:13px; border:2.5px solid var(--ink);
@@ -237,6 +238,27 @@
   .owner-anchor .hand{ position:absolute; top:0; left:2px; width:22px; height:16px; background:#F2C79A; border:2px solid var(--ink); border-radius:50% 50% 40% 40%; }
   .rope-dot{ position:absolute; width:12px; height:12px; background:#C9975C; border:2px solid var(--ink); border-radius:4px; z-index:3; pointer-events:none; }
   .rope-seg{ position:absolute; height:6px; background:#C9975C; border:2px solid var(--ink); border-radius:3px; transform-origin:0 50%; z-index:2; pointer-events:none; }
+
+  .duo-stage{ display:flex; align-items:flex-end; justify-content:center; gap:18px; margin:8px 0 4px; min-height:112px; }
+  .owner-figure{ position:relative; width:66px; height:108px; flex-shrink:0; }
+  .owner-hair{ position:absolute; top:-3px; left:13px; width:38px; height:20px; background:#8A5A3C; border:2.5px solid var(--ink); border-radius:50% 50% 15% 15%; z-index:1; }
+  .owner-head{ position:absolute; top:2px; left:15px; width:32px; height:30px; background:#F2C79A; border:2.5px solid var(--ink); border-radius:50%; z-index:2; }
+  .owner-eye{ position:absolute; top:14px; width:3px; height:4px; background:var(--ink); border-radius:50%; }
+  .owner-eye.l{ left:10px; } .owner-eye.r{ left:19px; }
+  .owner-smile{ position:absolute; top:20px; left:11px; width:10px; height:5px; border:2px solid var(--ink); border-top:none; border-radius:0 0 8px 8px; }
+  .owner-body{ position:absolute; top:28px; left:9px; width:48px; height:48px; background:#E8425F; border:2.5px solid var(--ink); border-radius:16px 16px 8px 8px; z-index:1; }
+  .owner-arm{ position:absolute; top:32px; width:11px; height:34px; background:#E8425F; border:2px solid var(--ink); border-radius:8px; z-index:0; }
+  .owner-arm.l{ left:0px; transform:rotate(10deg); } .owner-arm.r{ right:0px; transform:rotate(-10deg); }
+  .owner-leg{ position:absolute; top:72px; width:12px; height:30px; background:#3B2A45; border:2px solid var(--ink); border-radius:0 0 6px 6px; }
+  .owner-leg.l{ left:16px; } .owner-leg.r{ right:16px; }
+
+  .stat-row-home{ display:flex; gap:10px; margin:6px 0; justify-content:center; }
+  .stat-chip{ background:#fff; border:2.5px solid var(--ink); border-radius:12px; padding:4px 16px; font-size:9.5px; font-weight:700; color:var(--ink); line-height:1.3; box-shadow:0 3px 0 rgba(59,42,32,.2); }
+  .stat-chip b{ font-size:15px; display:block; }
+
+  .tab-bar{ display:flex; width:100%; max-width:300px; margin-top:auto; padding-top:10px; border-top:2px solid var(--ink); }
+  .tab-btn{ flex:1; text-align:center; padding:8px 4px 4px; font-weight:700; font-size:12px; color:var(--text-dim); cursor:pointer; }
+  .tab-btn.active{ color:var(--ink); border-bottom:3px solid var(--red); }
   .leash-cell-tap{ position:absolute; cursor:pointer; z-index:6; }
   .treat-prop{ position:absolute; width:22px; height:22px; z-index:1; animation: treatBounce 1s ease-in-out infinite; pointer-events:none;
     filter: drop-shadow(0 0 5px rgba(255,212,71,0.7)); }
@@ -499,32 +521,59 @@
   <div id="homeScreen" class="screen" style="align-items:center; text-align:center;">
     <div class="string-lights" id="stringLightsHome"></div>
     <div class="map-title">Best in Show</div>
-    <div class="map-sub">Your champion is ready to compete!</div>
-    <div class="mascot-wrap">
-      <div class="speech-bubble" id="homeSpeech">Let's go, pup!</div>
-      <div style="position:relative; width:100px; height:92px; margin:0 auto;">
+    <div class="stat-row-home">
+      <div class="stat-chip">Best Streak<b id="homeBestStreak">0</b></div>
+      <div class="stat-chip">Coins<b id="homeCoins">0</b></div>
+    </div>
+    <div class="speech-bubble" id="homeSpeech">Let's go, pup!</div>
+    <div class="duo-stage">
+      <div class="owner-figure" id="ownerHome"></div>
+      <div style="position:relative; width:100px; height:92px;">
         <div class="mascot" id="mascotHome"></div>
         <div id="wardrobeOverlay"></div>
       </div>
     </div>
-    <div class="stat" style="margin-top:8px;">
-      Best Streak: <b class="score" id="homeBestStreak">0</b> &nbsp;•&nbsp; Competitions Entered: <b id="homeTotalPlayed">0</b>
+    <div style="display:flex; flex-direction:column; gap:9px; width:100%; max-width:260px; margin-top:8px;">
+      <button id="enterCompBtn" class="primary-btn">Play!</button>
+      <button id="enterPageantBtn" class="action-btn" style="background:linear-gradient(160deg, rgba(255,255,255,.5), rgba(255,255,255,0) 50%), var(--gold);">Enter the Pageant</button>
+      <button id="wardrobeBtn" class="action-btn">Dress Up</button>
     </div>
-    <div style="display:flex; flex-direction:column; gap:10px; width:100%; max-width:260px; margin-top:16px;">
-      <button id="wardrobeBtn" class="action-btn" style="padding:14px;">Open Wardrobe</button>
-      <button id="enterCompBtn" class="primary-btn">Enter the Competition!</button>
+    <div class="tab-bar">
+      <div class="tab-btn active" data-tab="home">Home</div>
+      <div class="tab-btn" data-tab="trophies">Trophies</div>
     </div>
   </div>
 
   <div id="wardrobeScreen" class="screen hidden" style="align-items:center; text-align:center;">
-    <div class="map-title" style="font-size:22px;">Wardrobe</div>
-    <div style="position:relative; width:100px; height:92px; margin:10px auto;">
+    <div class="map-title" style="font-size:22px;">Dress Up</div>
+    <div class="tab-bar" style="max-width:220px; border-top:none; padding-top:0; margin-top:4px;">
+      <div class="tab-btn active" id="wardrobeTabDog">Dog</div>
+      <div class="tab-btn" id="wardrobeTabOwner">Owner</div>
+    </div>
+    <div style="position:relative; width:100px; height:110px; margin:10px auto;">
       <div class="mascot" id="mascotWardrobe"></div>
       <div id="wardrobePreviewOverlay"></div>
+      <div class="owner-figure hidden" id="ownerWardrobePreview" style="position:absolute; top:0; left:0;"></div>
     </div>
-    <div class="caption">Tap an unlocked item to try it on!</div>
+    <div class="caption" id="wardrobeCaption">Tap an unlocked item to try it on!</div>
     <div id="wardrobeGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; max-width:300px; margin:14px 0;"></div>
     <button id="wardrobeBackBtn" class="action-btn" style="max-width:260px;">Back</button>
+  </div>
+
+  <div id="trophiesScreen" class="screen hidden" style="align-items:center; text-align:center;">
+    <div class="map-title" style="font-size:22px;">Trophies</div>
+    <div class="caption">Win Pageants to fill your trophy case!</div>
+    <div id="trophyGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; max-width:300px; margin:14px 0;"></div>
+    <div class="tab-bar">
+      <div class="tab-btn" data-tab="home">Home</div>
+      <div class="tab-btn active" data-tab="trophies">Trophies</div>
+    </div>
+  </div>
+
+  <div id="pageantScreen" class="screen hidden" style="align-items:center; text-align:center;">
+    <div class="map-title" style="font-size:22px;">The Pageant</div>
+    <div class="caption" style="font-size:13px; max-width:280px; margin-top:16px;">Pageants are coming soon! Every so often, a new pageant will open — bring your best-groomed, best-dressed, trick-trained pup to compete for trophies and rare trading cards.</div>
+    <button id="pageantBackBtn" class="action-btn" style="max-width:260px; margin-top:24px;">Back</button>
   </div>
 
   <div id="mapScreen" class="screen hidden">
@@ -1041,6 +1090,40 @@
     if(!overlay) return;
     overlay.innerHTML = '';
     getEquipped().forEach(id => { overlay.innerHTML += wardrobeItemOverlayHTML(id); });
+  }
+
+  // ---- Coins + Owner character ----
+  function getCoins(){ return parseInt(localStorage.getItem('coins')||'0',10); }
+  function addCoins(n){ localStorage.setItem('coins', String(getCoins()+n)); }
+  function spendCoins(n){ const c=getCoins(); if(c<n) return false; localStorage.setItem('coins', String(c-n)); return true; }
+  const OWNER_ITEMS = [
+    { id:'sunhat', name:'Sun Hat', cost:20 },
+    { id:'bow', name:'Neck Bow', cost:15 },
+    { id:'sparkledress', name:'Sparkle Dress', cost:40 }
+  ];
+  function getOwnedOwnerItems(){ try{ return JSON.parse(localStorage.getItem('ownedOwnerItems')||'[]'); }catch(e){ return []; } }
+  function setOwnedOwnerItems(arr){ localStorage.setItem('ownedOwnerItems', JSON.stringify(arr)); }
+  function getEquippedOwner(){ try{ return JSON.parse(localStorage.getItem('equippedOwner')||'[]'); }catch(e){ return []; } }
+  function setEquippedOwner(arr){ localStorage.setItem('equippedOwner', JSON.stringify(arr)); }
+  function ownerItemOverlayHTML(id){
+    switch(id){
+      case 'sunhat': return '<div style="position:absolute;top:-9px;left:7px;width:52px;height:12px;background:#FFD447;border:2.5px solid #3B2A20;border-radius:50%;z-index:3;"></div><div style="position:absolute;top:-4px;left:19px;width:28px;height:14px;background:#FFD447;border:2.5px solid #3B2A20;border-radius:50% 50% 20% 20%;z-index:3;"></div>';
+      case 'bow': return '<div style="position:absolute;top:24px;left:19px;width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:9px solid #FF5A5F;z-index:3;"></div><div style="position:absolute;top:24px;left:33px;width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:9px solid #FF5A5F;z-index:3;"></div><div style="position:absolute;top:26px;left:29px;width:6px;height:6px;background:#8A5A12;border-radius:50%;z-index:3;"></div>';
+      case 'sparkledress': return '<div style="position:absolute;top:28px;left:9px;width:48px;height:48px;background:linear-gradient(160deg,#FFE49A,#B47BE0);border:2.5px solid #3B2A20;border-radius:16px 16px 8px 8px;z-index:2;"></div>';
+      default: return '';
+    }
+  }
+  function ownerFigureInnerHTML(overlayId){
+    return '<div class="owner-hair"></div><div class="owner-head"><div class="owner-eye l"></div><div class="owner-eye r"></div><div class="owner-smile"></div></div>' +
+      '<div class="owner-body"></div><div class="owner-arm l"></div><div class="owner-arm r"></div><div class="owner-leg l"></div><div class="owner-leg r"></div>' +
+      '<div id="'+overlayId+'"></div>';
+  }
+  function renderOwnerOnFigure(targetId, overlayId){
+    const fig = document.getElementById(targetId);
+    if(!fig) return;
+    fig.innerHTML = ownerFigureInnerHTML(overlayId);
+    const overlay = document.getElementById(overlayId);
+    getEquippedOwner().forEach(id => { overlay.innerHTML += ownerItemOverlayHTML(id); });
   }
 
   let state = { levelIndex:0, blocks:[], doors:[], initial:[], moves:0, history:[], highestUnlocked:0, score:0, combo:0, boosters:{paws:false,treat:false,double:false}, equippedBoosters:{paws:true,treat:true,double:true}, doubleActive:false, bossCompleted:false, isBoss:false, isEndless:false, endlessStreak:0, unlockedSnapshot:[], bossTimeLeft:60, bossTimerInterval:null };
@@ -1682,10 +1765,11 @@
     stopBossTimer();
     if(state.isEndless){
       state.endlessStreak++;
+      addCoins(8);
       const prevBest = parseInt(localStorage.getItem('endlessBest')||'0',10);
       const isNewBest = state.endlessStreak > prevBest;
       if(isNewBest) localStorage.setItem('endlessBest', String(state.endlessStreak));
-      document.getElementById('winStats').textContent = 'Streak: ' + state.endlessStreak + ' — cleared in ' + state.moves + ' moves' + (isNewBest ? ' — NEW BEST!' : ' (best: ' + Math.max(prevBest, state.endlessStreak) + ')');
+      document.getElementById('winStats').textContent = 'Streak: ' + state.endlessStreak + ' — cleared in ' + state.moves + ' moves — +8 coins!' + (isNewBest ? ' NEW BEST!' : ' (best: ' + Math.max(prevBest, state.endlessStreak) + ')');
       document.getElementById('nextBtn').textContent = 'Next Puzzle →';
       if(isNewBest) bark('New record!', 1.5, 1.1);
     } else if(state.isBoss){
@@ -1919,52 +2003,134 @@
   function showMap(){
     document.getElementById('gameScreen').classList.add('hidden');
     document.getElementById('wardrobeScreen').classList.add('hidden');
+    document.getElementById('trophiesScreen').classList.add('hidden');
+    document.getElementById('pageantScreen').classList.add('hidden');
     document.getElementById('homeScreen').classList.remove('hidden');
     setMascotMessage();
     document.getElementById('homeBestStreak').textContent = getBestStreak();
-    document.getElementById('homeTotalPlayed').textContent = getTotalPlayed();
+    document.getElementById('homeCoins').textContent = getCoins();
     renderWardrobeOnDog('wardrobeOverlay');
+    renderOwnerOnFigure('ownerHome', 'ownerOverlayHome');
+    setActiveTab('home');
+  }
+  function setActiveTab(tab){
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
+  }
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if(btn.dataset.tab==='home') showMap();
+      else if(btn.dataset.tab==='trophies') showTrophies();
+    });
+  });
+  function showTrophies(){
+    document.getElementById('homeScreen').classList.add('hidden');
+    document.getElementById('gameScreen').classList.add('hidden');
+    document.getElementById('wardrobeScreen').classList.add('hidden');
+    document.getElementById('pageantScreen').classList.add('hidden');
+    document.getElementById('trophiesScreen').classList.remove('hidden');
+    setActiveTab('trophies');
+    const grid = document.getElementById('trophyGrid');
+    grid.innerHTML = '';
+    for(let i=0;i<6;i++){
+      const slot = document.createElement('div');
+      slot.style.cssText = 'background:#D8D0C4; border:2.5px solid #3B2A20; border-radius:14px; padding:16px 4px; text-align:center; opacity:.6;';
+      slot.innerHTML = '<div style="font-size:22px; font-weight:800; color:#8A7A6C;">?</div><div style="font-size:9px; color:#8A7A6C; margin-top:4px;">Locked</div>';
+      grid.appendChild(slot);
+    }
   }
   document.getElementById('enterCompBtn').addEventListener('click', startEndless);
+  document.getElementById('enterPageantBtn').addEventListener('click', () => {
+    document.getElementById('homeScreen').classList.add('hidden');
+    document.getElementById('pageantScreen').classList.remove('hidden');
+  });
+  document.getElementById('pageantBackBtn').addEventListener('click', showMap);
+  let wardrobeActiveTab = 'dog';
   document.getElementById('wardrobeBtn').addEventListener('click', () => {
     document.getElementById('homeScreen').classList.add('hidden');
     document.getElementById('wardrobeScreen').classList.remove('hidden');
+    wardrobeActiveTab = 'dog';
     renderWardrobeScreen();
-    renderWardrobeOnDog('wardrobePreviewOverlay');
   });
   document.getElementById('wardrobeBackBtn').addEventListener('click', showMap);
+  document.getElementById('wardrobeTabDog').addEventListener('click', () => { wardrobeActiveTab='dog'; renderWardrobeScreen(); });
+  document.getElementById('wardrobeTabOwner').addEventListener('click', () => { wardrobeActiveTab='owner'; renderWardrobeScreen(); });
   function renderWardrobeScreen(){
+    document.getElementById('wardrobeTabDog').classList.toggle('active', wardrobeActiveTab==='dog');
+    document.getElementById('wardrobeTabOwner').classList.toggle('active', wardrobeActiveTab==='owner');
+    document.getElementById('mascotWardrobe').classList.toggle('hidden', wardrobeActiveTab!=='dog');
+    document.getElementById('wardrobePreviewOverlay').classList.toggle('hidden', wardrobeActiveTab!=='dog');
+    document.getElementById('ownerWardrobePreview').classList.toggle('hidden', wardrobeActiveTab!=='owner');
+    if(wardrobeActiveTab==='dog'){ renderWardrobeOnDog('wardrobePreviewOverlay'); }
+    else { renderOwnerOnFigure('ownerWardrobePreview', 'ownerOverlayWardrobe'); }
     const grid = document.getElementById('wardrobeGrid');
     grid.innerHTML = '';
-    const equipped = getEquipped();
-    WARDROBE_ITEMS.forEach(item => {
-      const unlocked = isItemUnlocked(item);
-      const isEquipped = equipped.includes(item.id);
-      const card = document.createElement('div');
-      card.style.cssText = 'background:'+(unlocked?'#FFFBF0':'#D8D0C4')+'; border:2.5px solid #3B2A20; border-radius:14px; padding:10px 4px; cursor:'+(unlocked?'pointer':'default')+'; text-align:center;' + (isEquipped?' box-shadow:0 0 0 3px rgba(123,201,111,0.6);':'');
-      let statusHTML;
-      if(!unlocked){
-        const lockText = item.unlockType==='streak' ? ('Streak '+item.value) : ('Play '+item.value+'x');
-        statusHTML = '<div style="font-size:9px; color:#B0463F; font-weight:700;">Locked: '+lockText+'</div>';
-      } else if(isEquipped){
-        statusHTML = '<div style="font-size:10px; color:#3B8C3B; font-weight:800;">✓ Worn</div>';
-      } else {
-        statusHTML = '<div style="font-size:10px; color:#8A7A6C;">Tap to wear</div>';
-      }
-      card.innerHTML = '<div style="font-weight:700; font-size:11px; margin-bottom:4px; color:#3B2A20;">'+item.name+'</div>' + statusHTML;
-      if(unlocked){
+    if(wardrobeActiveTab==='dog'){
+      document.getElementById('wardrobeCaption').textContent = 'Tap an unlocked item to try it on!';
+      const equipped = getEquipped();
+      WARDROBE_ITEMS.forEach(item => {
+        const unlocked = isItemUnlocked(item);
+        const isEquipped = equipped.includes(item.id);
+        const card = document.createElement('div');
+        card.style.cssText = 'background:'+(unlocked?'#FFFBF0':'#D8D0C4')+'; border:2.5px solid #3B2A20; border-radius:14px; padding:10px 4px; cursor:'+(unlocked?'pointer':'default')+'; text-align:center;' + (isEquipped?' box-shadow:0 0 0 3px rgba(123,201,111,0.6);':'');
+        let statusHTML;
+        if(!unlocked){
+          const lockText = item.unlockType==='streak' ? ('Streak '+item.value) : ('Play '+item.value+'x');
+          statusHTML = '<div style="font-size:9px; color:#B0463F; font-weight:700;">Locked: '+lockText+'</div>';
+        } else if(isEquipped){
+          statusHTML = '<div style="font-size:10px; color:#3B8C3B; font-weight:800;">✓ Worn</div>';
+        } else {
+          statusHTML = '<div style="font-size:10px; color:#8A7A6C;">Tap to wear</div>';
+        }
+        card.innerHTML = '<div style="font-weight:700; font-size:11px; margin-bottom:4px; color:#3B2A20;">'+item.name+'</div>' + statusHTML;
+        if(unlocked){
+          card.addEventListener('click', () => {
+            let eq = getEquipped();
+            if(eq.includes(item.id)) eq = eq.filter(x=>x!==item.id);
+            else eq.push(item.id);
+            setEquipped(eq);
+            renderWardrobeScreen();
+            ensureAudio(); tone(600,0.08,'sine',0.1,0);
+          });
+        }
+        grid.appendChild(card);
+      });
+    } else {
+      document.getElementById('wardrobeCaption').textContent = 'Buy outfits with coins, then tap to wear them!';
+      const owned = getOwnedOwnerItems();
+      const equippedOwner = getEquippedOwner();
+      OWNER_ITEMS.forEach(item => {
+        const isOwned = owned.includes(item.id);
+        const isEquipped = equippedOwner.includes(item.id);
+        const card = document.createElement('div');
+        card.style.cssText = 'background:#FFFBF0; border:2.5px solid #3B2A20; border-radius:14px; padding:10px 4px; cursor:pointer; text-align:center;' + (isEquipped?' box-shadow:0 0 0 3px rgba(123,201,111,0.6);':'');
+        let statusHTML;
+        if(!isOwned) statusHTML = '<div style="font-size:10px; color:#B0463F; font-weight:700;">'+item.cost+' coins</div>';
+        else if(isEquipped) statusHTML = '<div style="font-size:10px; color:#3B8C3B; font-weight:800;">✓ Worn</div>';
+        else statusHTML = '<div style="font-size:10px; color:#8A7A6C;">Tap to wear</div>';
+        card.innerHTML = '<div style="font-weight:700; font-size:11px; margin-bottom:4px; color:#3B2A20;">'+item.name+'</div>' + statusHTML;
         card.addEventListener('click', () => {
-          let eq = getEquipped();
-          if(eq.includes(item.id)) eq = eq.filter(x=>x!==item.id);
-          else eq.push(item.id);
-          setEquipped(eq);
-          renderWardrobeScreen();
-          renderWardrobeOnDog('wardrobePreviewOverlay');
-          ensureAudio(); tone(600,0.08,'sine',0.1,0);
+          if(!isOwned){
+            if(spendCoins(item.cost)){
+              const o = getOwnedOwnerItems(); o.push(item.id); setOwnedOwnerItems(o);
+              const eq = getEquippedOwner(); eq.push(item.id); setEquippedOwner(eq);
+              ensureAudio(); playBooster();
+              renderWardrobeScreen();
+            } else {
+              ensureAudio(); tone(160,0.15,'sawtooth',0.1,0);
+              card.classList.add('shake'); setTimeout(()=>card.classList.remove('shake'), 300);
+            }
+          } else {
+            let eq = getEquippedOwner();
+            if(eq.includes(item.id)) eq = eq.filter(x=>x!==item.id);
+            else eq.push(item.id);
+            setEquippedOwner(eq);
+            renderWardrobeScreen();
+            ensureAudio(); tone(600,0.08,'sine',0.1,0);
+          }
         });
-      }
-      grid.appendChild(card);
-    });
+        grid.appendChild(card);
+      });
+    }
   }
   const NODE_COORDS = [
     {x:160, y:30}, {x:80, y:150}, {x:230, y:270}, {x:70, y:390}, {x:200, y:510}, {x:150, y:615}
