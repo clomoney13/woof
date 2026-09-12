@@ -236,6 +236,15 @@
 
   .overlay{ position:fixed; inset:0; background: rgba(59,42,32,0.55); display:flex; align-items:center; justify-content:center; padding:24px; z-index:40; overflow:hidden; }
   .overlay.hidden{ display:none; }
+  .win-card.near-miss{ animation: nearMissPulse 0.5s ease-in-out 3, popIn .35s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes nearMissPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(232,160,48,0.6);} 50%{ box-shadow:0 0 0 14px rgba(232,160,48,0);} }
+  .star-reveal{ display:flex; justify-content:center; gap:8px; margin:6px 0 12px; }
+  .star-slot{ width:38px; height:38px; opacity:0; transform:scale(0) rotate(-30deg); background:#C9C0B4;
+    clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+    filter: drop-shadow(0 2px 2px rgba(59,42,32,0.3)); }
+  .star-slot.earned{ background: linear-gradient(160deg, #FFE49A, var(--gold)); }
+  .star-slot.pop{ animation: starPop .5s cubic-bezier(.34,1.56,.64,1) forwards; }
+  @keyframes starPop{ to{ opacity:1; transform:scale(1) rotate(0deg); } }
   .win-card, .ad-card, .complete-card{
     background: linear-gradient(160deg, #fff, var(--cream) 65%); border:3px solid var(--ink); border-radius:24px;
     padding:34px 22px 28px; text-align:center; max-width:340px; width:100%;
@@ -526,19 +535,50 @@
     </footer>
   </div>
 
+  <div id="showdownScreen" class="screen hidden">
+    <header>
+      <div class="wordmark">Showdown</div>
+      <div class="level-info">Beat the<br>Rival</div>
+      <div class="map-pill" id="showdownMapBtn"><div class="mini-rosette"></div>Map</div>
+    </header>
+    <div class="caption">Drag your pup to dodge the throws — catch the treats for bonus points!</div>
+    <div class="stat"><b class="score" id="showdownScoreVal">0</b> pts &nbsp;•&nbsp; Lives: <b id="showdownLivesVal">3</b> &nbsp;•&nbsp; Goal: <b>150</b></div>
+    <div id="showdownLaneWrap">
+      <div id="showdownLane">
+        <div id="villain">
+          <div class="villain-head">
+            <div class="villain-hair"></div>
+            <div class="villain-brow l"></div><div class="villain-brow r"></div>
+            <div class="villain-eye l"></div><div class="villain-eye r"></div>
+            <div class="villain-mouth"></div>
+          </div>
+          <div class="villain-body"></div>
+          <div class="villain-arm" id="villainArm"></div>
+        </div>
+        <div id="showdownDog"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div id="winOverlay" class="overlay hidden">
   <div id="confettiLayer"></div>
   <div class="win-card">
     <div class="mascot cheer" id="mascotWin" style="transform:scale(0.72); margin:-10px auto -6px;"></div>
-    <h2>Star of the Show!</h2><p id="winStats"></p><button id="nextBtn" class="primary-btn">Back to the map</button>
+    <h2>Star of the Show!</h2>
+    <div class="star-reveal" id="starReveal">
+      <div class="star-slot" id="star1"></div>
+      <div class="star-slot" id="star2"></div>
+      <div class="star-slot" id="star3"></div>
+    </div>
+    <p id="winStats"></p><button id="nextBtn" class="primary-btn">Back to the map</button>
   </div>
 </div>
 <div id="failOverlay" class="overlay hidden">
-  <div class="win-card" style="border-color:#B0463F;">
-    <h2 style="color:#B0463F;">Out of Moves!</h2>
-    <p>This one needs a cleverer path through the jam. Want to try again?</p>
+  <div class="win-card" id="failCard" style="border-color:#B0463F;">
+    <h2 id="failTitle" style="color:#B0463F;">Out of Moves!</h2>
+    <p id="failMsg">This one needs a cleverer path through the jam. Want to try again?</p>
     <button id="retryBtn" class="primary-btn">Retry Level</button>
   </div>
 </div>
@@ -548,31 +588,6 @@
     <p>You've cleared every runway on the circuit. Now the rival handler wants a word — face them in the Showdown!</p>
     <button id="enterBossBtn" class="primary-btn">Enter the Showdown!</button>
     <button id="skipBossBtn" class="action-btn" style="margin-top:8px;">Back to the map</button>
-  </div>
-</div>
-
-<div id="showdownScreen" class="screen hidden">
-  <header>
-    <div class="wordmark">Showdown</div>
-    <div class="level-info">Beat the<br>Rival</div>
-    <div class="map-pill" id="showdownMapBtn"><div class="mini-rosette"></div>Map</div>
-  </header>
-  <div class="caption">Drag your pup to dodge the throws — catch the treats for bonus points!</div>
-  <div class="stat"><b class="score" id="showdownScoreVal">0</b> pts &nbsp;•&nbsp; Lives: <b id="showdownLivesVal">3</b> &nbsp;•&nbsp; Goal: <b>150</b></div>
-  <div id="showdownLaneWrap">
-    <div id="showdownLane">
-      <div id="villain">
-        <div class="villain-head">
-          <div class="villain-hair"></div>
-          <div class="villain-brow l"></div><div class="villain-brow r"></div>
-          <div class="villain-eye l"></div><div class="villain-eye r"></div>
-          <div class="villain-mouth"></div>
-        </div>
-        <div class="villain-body"></div>
-        <div class="villain-arm" id="villainArm"></div>
-      </div>
-      <div id="showdownDog"></div>
-    </div>
   </div>
 </div>
 
@@ -1131,7 +1146,16 @@
       dragging = false;
       el.classList.remove('dragging');
       const dir = delta > 8 ? 1 : (delta < -8 ? -1 : 0);
-      if(dir === 0){ applyBlockStyle(el, b); return; }
+      if(dir === 0){
+        for(const tryDir of [1,-1]){
+          if(isFlushAgainstEdge(b, tryDir) && matchingDoor(b, tryDir)){
+            commitMove(b, tryDir, el);
+            return;
+          }
+        }
+        applyBlockStyle(el, b);
+        return;
+      }
       commitMove(b, dir, el);
     };
     el.addEventListener('pointerup', endDrag);
@@ -1243,6 +1267,13 @@
     spawnPointPopup(ORIGIN+144, ORIGIN+144, '2× READY!', '#FF5A5F');
   });
 
+  function computeStars(){
+    const usedBooster = state.boosters.paws || state.boosters.treat || state.boosters.double;
+    const efficient = state.moves <= (state.moveLimit - 1);
+    if(efficient && !usedBooster) return 3;
+    if(efficient || !usedBooster) return 2;
+    return 1;
+  }
   function showWin(){
     stopBossTimer();
     if(state.isBoss){
@@ -1252,12 +1283,48 @@
     } else {
       document.getElementById('winStats').textContent = 'Cleared in ' + state.moves + ' moves — ' + state.score + ' pts.';
     }
+    const stars = state.isBoss ? 3 : computeStars();
+    ['star1','star2','star3'].forEach(id => {
+      const el = document.getElementById(id);
+      el.className = 'star-slot';
+    });
     document.getElementById('winOverlay').classList.remove('hidden');
-    playWin(); spawnConfetti(); celebrateHit();
+    celebrateHit();
+    const starTones = [660, 784, 988];
+    ['star1','star2','star3'].forEach((id, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        el.classList.add('pop');
+        if(i < stars){ el.classList.add('earned'); tone(starTones[i], 0.18, 'triangle', 0.16, 0); }
+        else { tone(220, 0.1, 'sine', 0.08, 0); }
+        haptic(10);
+      }, 180 + i*260);
+    });
+    setTimeout(() => { playWin(); spawnConfetti(); }, 180 + 3*260 + 150);
   }
   function showFail(){
     stopBossTimer();
-    tone(300,0.15,'sawtooth',0.1,0); tone(200,0.18,'sawtooth',0.1,150); tone(140,0.22,'sawtooth',0.11,300);
+    const remaining = state.blocks.length;
+    const nearMiss = remaining === 1;
+    const card = document.getElementById('failCard');
+    const title = document.getElementById('failTitle');
+    const msg = document.getElementById('failMsg');
+    if(nearMiss){
+      card.style.borderColor = '#E8A030';
+      card.classList.add('near-miss');
+      title.textContent = 'So Close!';
+      title.style.color = '#E8A030';
+      msg.textContent = 'Just ONE more pup needed a home! You were almost there — try again?';
+      tone(500,0.1,'triangle',0.12,0); tone(650,0.12,'triangle',0.12,120); tone(500,0.14,'triangle',0.11,260);
+      haptic([15,30,15,30,15]);
+    } else {
+      card.style.borderColor = '#B0463F';
+      card.classList.remove('near-miss');
+      title.textContent = 'Out of Moves!';
+      title.style.color = '#B0463F';
+      msg.textContent = 'This one needs a cleverer path through the jam. Want to try again?';
+      tone(300,0.15,'sawtooth',0.1,0); tone(200,0.18,'sawtooth',0.1,150); tone(140,0.22,'sawtooth',0.11,300);
+    }
     document.getElementById('failOverlay').classList.remove('hidden');
   }
   document.getElementById('retryBtn').addEventListener('click', () => {
