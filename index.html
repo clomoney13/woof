@@ -500,6 +500,12 @@
     <div class="string-lights" id="stringLights"></div>
     <div class="map-title">Best in Show</div>
     <div class="map-sub">Tap a level to strut your pup down the runway!</div>
+    <div id="endlessCard" style="background:linear-gradient(160deg, rgba(255,255,255,.5), rgba(255,255,255,0) 45%), var(--purple);
+      border:3px solid var(--ink); border-radius:18px; padding:10px 16px; margin:10px auto 4px; max-width:260px; cursor:pointer;
+      box-shadow:0 4px 0 rgba(59,42,32,.25); text-align:center;">
+      <div style="font-family:'Baloo 2',sans-serif; font-weight:800; color:#fff; font-size:16px;">Endless Mode</div>
+      <div style="font-size:11px; color:#fff; font-weight:600;">Best streak: <b id="endlessBestLabel">0</b></div>
+    </div>
     <div class="mascot-wrap">
       <div class="speech-bubble" id="mascotSpeech">Let's go, pup!</div>
       <div class="mascot" id="mascotDog"></div>
@@ -848,7 +854,121 @@
     treats:[{x:3,y:2},{x:2,y:4}]
   };
 
-  let state = { levelIndex:0, blocks:[], doors:[], initial:[], moves:0, history:[], highestUnlocked:0, score:0, combo:0, boosters:{paws:false,treat:false,double:false}, equippedBoosters:{paws:true,treat:true,double:true}, doubleActive:false, bossCompleted:false, isBoss:false, bossTimeLeft:60, bossTimerInterval:null };
+  // ---- Solver + Generator for Endless Mode: verifies every generated puzzle is genuinely solvable ----
+  function simOccupiesCell(b,x,y){
+    return b.orient==='h' ? (y===b.y && x>=b.x && x<b.x+b.w) : (x===b.x && y>=b.y && y<b.y+b.h);
+  }
+  function simIsOccupied(blocks,x,y,excludeId){
+    return blocks.some(b => b.id!==excludeId && !b.exited && simOccupiesCell(b,x,y));
+  }
+  function simMaxSlide(blocks,b,dir,gridW,gridH){
+    let step=0;
+    while(true){
+      const next=step+1;
+      const nx = b.orient==='h' ? b.x+dir*next : b.x;
+      const ny = b.orient==='v' ? b.y+dir*next : b.y;
+      const len = b.orient==='h' ? b.w : b.h;
+      let blocked=false;
+      for(let i=0;i<len;i++){
+        const cx = b.orient==='h' ? nx+i : nx;
+        const cy = b.orient==='v' ? ny+i : ny;
+        if(cx<0||cx>=gridW||cy<0||cy>=gridH){ blocked=true; break; }
+        if(simIsOccupied(blocks,cx,cy,b.id)){ blocked=true; break; }
+      }
+      if(blocked) break;
+      step=next;
+    }
+    return step;
+  }
+  function simIsFlush(b,dir,gridW,gridH){
+    if(b.orient==='h') return dir===1 ? (b.x+b.w-1)===gridW-1 : b.x===0;
+    return dir===1 ? (b.y+b.h-1)===gridH-1 : b.y===0;
+  }
+  function simMatchingDoor(doors,b,dir){
+    const side = b.orient==='h' ? (dir===1?'right':'left') : (dir===1?'bottom':'top');
+    const lane = b.orient==='h' ? b.y : b.x;
+    return doors.find(d => d.side===side && d.lane===lane && d.color===b.color);
+  }
+  function stateKey(blocks){ return blocks.map(b => b.exited ? 'X' : (b.x+','+b.y)).join('|'); }
+
+  function solvePuzzle(initialBlocks, doors, gridW, gridH, maxStates){
+    maxStates = maxStates || 12000;
+    const start = initialBlocks.map(b => ({...b, exited:false}));
+    const visited = new Set([stateKey(start)]);
+    let frontier = [{ blocks:start, moves:0 }];
+    let explored = 0;
+    while(frontier.length){
+      const next = [];
+      for(const node of frontier){
+        explored++;
+        if(explored > maxStates) return { solvable:false, minMoves:null };
+        const active = node.blocks.filter(b => !b.exited);
+        if(active.length === 0) return { solvable:true, minMoves:node.moves };
+        for(const b of active){
+          for(const dir of [1,-1]){
+            const slide = simMaxSlide(active, b, dir, gridW, gridH);
+            const nx = b.orient==='h' ? b.x+dir*slide : b.x;
+            const ny = b.orient==='v' ? b.y+dir*slide : b.y;
+            const test = {...b, x:nx, y:ny};
+            const flush = simIsFlush(test, dir, gridW, gridH);
+            const door = flush && simMatchingDoor(doors, test, dir);
+            if(slide === 0 && !door) continue;
+            const newBlocks = node.blocks.map(x => x.id===b.id ? (door ? {...x, exited:true} : {...x, x:nx, y:ny}) : {...x});
+            const key = stateKey(newBlocks);
+            if(visited.has(key)) continue;
+            visited.add(key);
+            next.push({ blocks:newBlocks, moves:node.moves+1 });
+          }
+        }
+      }
+      frontier = next;
+    }
+    return { solvable:false, minMoves:null };
+  }
+
+  function generateRandomLevel(blockCount, gridW, gridH, targetMinMoves){
+    const colors = ['red','blue','green','yellow','teal','orange','purple','pink'];
+    let best = null;
+    const ATTEMPTS = 70;
+    for(let attempt=0; attempt<ATTEMPTS; attempt++){
+      const shuffled = colors.slice().sort(() => Math.random()-0.5);
+      const blocks = [], doors = [], occupied = new Set();
+      let ok = true;
+      for(let i=0;i<blockCount;i++){
+        const orient = Math.random() < 0.5 ? 'h' : 'v';
+        const len = Math.random() < 0.55 ? 2 : 1;
+        let placed = false;
+        for(let t=0; t<50 && !placed; t++){
+          const maxX = orient==='h' ? gridW-len : gridW-1;
+          const maxY = orient==='v' ? gridH-len : gridH-1;
+          const x = Math.floor(Math.random()*(maxX+1));
+          const y = Math.floor(Math.random()*(maxY+1));
+          const cells = [];
+          for(let k=0;k<len;k++) cells.push(orient==='h' ? [x+k,y] : [x,y+k]);
+          if(cells.every(([cx,cy]) => !occupied.has(cx+','+cy))){
+            cells.forEach(([cx,cy]) => occupied.add(cx+','+cy));
+            const b = { id:'g'+i, color:shuffled[i%shuffled.length], orient, x, y, w:(orient==='h'?len:1), h:(orient==='v'?len:1) };
+            blocks.push(b);
+            const side = orient==='h' ? (Math.random()<0.5?'left':'right') : (Math.random()<0.5?'top':'bottom');
+            const lane = orient==='h' ? y : x;
+            doors.push({ side, lane, color:b.color });
+            placed = true;
+          }
+        }
+        if(!placed){ ok=false; break; }
+      }
+      if(!ok) continue;
+      const result = solvePuzzle(blocks, doors, gridW, gridH);
+      if(!result.solvable) continue;
+      if(!best || result.minMoves > best.minMoves){
+        best = { blocks, doors, moveLimit: result.minMoves+1, treats:[], minMoves: result.minMoves };
+      }
+      if(best.minMoves >= targetMinMoves) break;
+    }
+    return best;
+  }
+
+  let state = { levelIndex:0, blocks:[], doors:[], initial:[], moves:0, history:[], highestUnlocked:0, score:0, combo:0, boosters:{paws:false,treat:false,double:false}, equippedBoosters:{paws:true,treat:true,double:true}, doubleActive:false, bossCompleted:false, isBoss:false, isEndless:false, endlessStreak:0, bossTimeLeft:60, bossTimerInterval:null };
   let blockEls = {};
 
   function occupiesCell(b,x,y){
@@ -901,6 +1021,7 @@
 
   function startLevel(){
     state.isBoss = false;
+    state.isEndless = false;
     stopBossTimer();
     document.getElementById('timerWrap').classList.add('hidden');
     loadPuzzle(LEVELS[state.levelIndex]);
@@ -910,6 +1031,7 @@
   }
   function startBossPuzzle(){
     state.isBoss = true;
+    state.isEndless = false;
     loadPuzzle(BOSS_LEVEL);
     document.getElementById('levelSub').textContent = '';
     document.getElementById('levelNum').textContent = 'BOSS';
@@ -1483,12 +1605,22 @@
   }
   function showWin(){
     stopBossTimer();
-    if(state.isBoss){
+    if(state.isEndless){
+      state.endlessStreak++;
+      const prevBest = parseInt(localStorage.getItem('endlessBest')||'0',10);
+      const isNewBest = state.endlessStreak > prevBest;
+      if(isNewBest) localStorage.setItem('endlessBest', String(state.endlessStreak));
+      document.getElementById('winStats').textContent = 'Streak: ' + state.endlessStreak + ' — cleared in ' + state.moves + ' moves' + (isNewBest ? ' — NEW BEST!' : ' (best: ' + Math.max(prevBest, state.endlessStreak) + ')');
+      document.getElementById('nextBtn').textContent = 'Next Puzzle →';
+      if(isNewBest) bark('New record!', 1.5, 1.1);
+    } else if(state.isBoss){
       document.getElementById('winStats').textContent = 'Boss cleared in ' + state.moves + ' moves — ' + state.score + ' pts. You are officially Best in Show!';
       state.bossCompleted = true;
       bark('Champion!', 1.4, 1.0);
+      document.getElementById('nextBtn').textContent = 'Back to the map';
     } else {
       document.getElementById('winStats').textContent = 'Cleared in ' + state.moves + ' moves — ' + state.score + ' pts.';
+      document.getElementById('nextBtn').textContent = 'Back to the map';
     }
     const stars = state.isBoss ? 3 : computeStars();
     ['star1','star2','star3'].forEach(id => {
@@ -1511,11 +1643,24 @@
   }
   function showFail(){
     stopBossTimer();
+    if(state.isEndless){
+      const prevBest = parseInt(localStorage.getItem('endlessBest')||'0',10);
+      const card = document.getElementById('failCard');
+      card.style.borderColor = '#B0463F'; card.classList.remove('near-miss');
+      document.getElementById('failTitle').textContent = 'Streak Over!';
+      document.getElementById('failTitle').style.color = '#B0463F';
+      document.getElementById('failMsg').textContent = 'You reached a streak of ' + state.endlessStreak + '! Best ever: ' + Math.max(prevBest, state.endlessStreak) + '. Ready to beat it?';
+      document.getElementById('retryBtn').textContent = 'Start New Streak';
+      tone(300,0.15,'sawtooth',0.1,0); tone(200,0.18,'sawtooth',0.1,150); tone(140,0.22,'sawtooth',0.11,300);
+      document.getElementById('failOverlay').classList.remove('hidden');
+      return;
+    }
     const remaining = state.blocks.length;
     const nearMiss = remaining === 1;
     const card = document.getElementById('failCard');
     const title = document.getElementById('failTitle');
     const msg = document.getElementById('failMsg');
+    document.getElementById('retryBtn').textContent = 'Retry Level';
     if(nearMiss){
       card.style.borderColor = '#E8A030';
       card.classList.add('near-miss');
@@ -1536,15 +1681,37 @@
   }
   document.getElementById('retryBtn').addEventListener('click', () => {
     document.getElementById('failOverlay').classList.add('hidden');
-    if(state.isBoss) startBossPuzzle(); else startLevel();
+    if(state.isEndless) startEndless();
+    else if(state.isBoss) startBossPuzzle();
+    else startLevel();
   });
   document.getElementById('nextBtn').addEventListener('click', () => {
     document.getElementById('winOverlay').classList.add('hidden');
+    if(state.isEndless){ nextEndlessLevel(); return; }
     if(state.isBoss){ document.getElementById('gameScreen').classList.add('hidden'); showMap(); return; }
     if(state.levelIndex+1 > state.highestUnlocked) state.highestUnlocked = state.levelIndex+1;
     if(state.levelIndex < LEVELS.length-1){ showMap(); }
     else { document.getElementById('gameScreen').classList.add('hidden'); document.getElementById('completeOverlay').classList.remove('hidden'); }
   });
+  function startEndless(){
+    state.isBoss = false;
+    state.isEndless = true;
+    state.endlessStreak = 0;
+    nextEndlessLevel();
+  }
+  function nextEndlessLevel(){
+    const blockCount = Math.min(3 + Math.floor(state.endlessStreak/2), 6);
+    const target = blockCount + 1;
+    let lvl = generateRandomLevel(blockCount, GRID_W, GRID_H, target);
+    if(!lvl) lvl = generateRandomLevel(blockCount, GRID_W, GRID_H, blockCount);
+    if(!lvl) lvl = generateRandomLevel(Math.max(3,blockCount-1), GRID_W, GRID_H, 3);
+    stopBossTimer();
+    document.getElementById('timerWrap').classList.add('hidden');
+    loadPuzzle(lvl);
+    document.getElementById('levelSub').textContent = '';
+    document.getElementById('levelNum').textContent = 'Streak ' + state.endlessStreak;
+    document.getElementById('wordmarkGame').textContent = 'Endless';
+  }
   document.getElementById('skipBossBtn').addEventListener('click', () => {
     document.getElementById('completeOverlay').classList.add('hidden');
     showMap();
@@ -1669,7 +1836,9 @@
     document.getElementById('mapScreen').classList.remove('hidden');
     renderMap();
     setMascotMessage();
+    document.getElementById('endlessBestLabel').textContent = localStorage.getItem('endlessBest') || '0';
   }
+  document.getElementById('endlessCard').addEventListener('click', startEndless);
   const NODE_COORDS = [
     {x:160, y:30}, {x:80, y:150}, {x:230, y:270}, {x:70, y:390}, {x:200, y:510}, {x:150, y:615}
   ];
