@@ -496,7 +496,38 @@
   <div class="balloon" id="balloon1" style="top:70px; width:38px; height:46px; background:var(--red); animation-duration:26s;"><div class="string"></div><div class="basket"></div></div>
   <div class="balloon" id="balloon2" style="top:160px; width:30px; height:37px; background:var(--purple); animation-duration:34s; animation-delay:-14s;"><div class="string"></div><div class="basket"></div></div>
 
-  <div id="mapScreen" class="screen">
+  <div id="homeScreen" class="screen" style="align-items:center; text-align:center;">
+    <div class="string-lights" id="stringLightsHome"></div>
+    <div class="map-title">Best in Show</div>
+    <div class="map-sub">Your champion is ready to compete!</div>
+    <div class="mascot-wrap">
+      <div class="speech-bubble" id="homeSpeech">Let's go, pup!</div>
+      <div style="position:relative; width:100px; height:92px; margin:0 auto;">
+        <div class="mascot" id="mascotHome"></div>
+        <div id="wardrobeOverlay"></div>
+      </div>
+    </div>
+    <div class="stat" style="margin-top:8px;">
+      Best Streak: <b class="score" id="homeBestStreak">0</b> &nbsp;•&nbsp; Competitions Entered: <b id="homeTotalPlayed">0</b>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px; width:100%; max-width:260px; margin-top:16px;">
+      <button id="wardrobeBtn" class="action-btn" style="padding:14px;">Open Wardrobe</button>
+      <button id="enterCompBtn" class="primary-btn">Enter the Competition!</button>
+    </div>
+  </div>
+
+  <div id="wardrobeScreen" class="screen hidden" style="align-items:center; text-align:center;">
+    <div class="map-title" style="font-size:22px;">Wardrobe</div>
+    <div style="position:relative; width:100px; height:92px; margin:10px auto;">
+      <div class="mascot" id="mascotWardrobe"></div>
+      <div id="wardrobePreviewOverlay"></div>
+    </div>
+    <div class="caption">Tap an unlocked item to try it on!</div>
+    <div id="wardrobeGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; max-width:300px; margin:14px 0;"></div>
+    <button id="wardrobeBackBtn" class="action-btn" style="max-width:260px;">Back</button>
+  </div>
+
+  <div id="mapScreen" class="screen hidden">
     <div class="string-lights" id="stringLights"></div>
     <div class="map-title">Best in Show</div>
     <div class="map-sub">Tap a level to strut your pup down the runway!</div>
@@ -720,24 +751,27 @@
       '<div class="mascot-eye l"></div><div class="mascot-eye r"></div>' +
       '<div class="mascot-nose"></div><div class="mascot-tongue"></div>';
   }
-  ['mascotDog','mascotWin','mascotLoadout'].forEach(id => {
+  ['mascotDog','mascotWin','mascotLoadout','mascotHome','mascotWardrobe'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.innerHTML = dogHTML();
   });
 
   const bulbColors = ['#FFD447','#FF5A5F','#4FB8E8','#7BC96F','#FF7BAC'];
-  const lightsEl = document.getElementById('stringLights');
-  for(let i=0;i<11;i++){
-    const b = document.createElement('div');
-    b.className = 'bulb';
-    b.style.color = bulbColors[i % bulbColors.length];
-    b.style.background = bulbColors[i % bulbColors.length];
-    b.style.left = (i*9 + 4)+'%';
-    const sag = Math.sin((i/10)*Math.PI) * 14;
-    b.style.top = (2 + sag)+'px';
-    b.style.animationDelay = (i*0.15)+'s';
-    lightsEl.appendChild(b);
-  }
+  ['stringLightsHome','stringLights'].forEach(elId => {
+    const lightsEl = document.getElementById(elId);
+    if(!lightsEl) return;
+    for(let i=0;i<11;i++){
+      const b = document.createElement('div');
+      b.className = 'bulb';
+      b.style.color = bulbColors[i % bulbColors.length];
+      b.style.background = bulbColors[i % bulbColors.length];
+      b.style.left = (i*9 + 4)+'%';
+      const sag = Math.sin((i/10)*Math.PI) * 14;
+      b.style.top = (2 + sag)+'px';
+      b.style.animationDelay = (i*0.15)+'s';
+      lightsEl.appendChild(b);
+    }
+  });
 
   const decoKinds = ['bone','bow','ball','paw'];
   for(let i=0;i<8;i++){
@@ -792,10 +826,13 @@
   function playWin(){ [523,659,784,1047].forEach((f,i)=>tone(f,0.15,'sine',0.12,i*90)); bark('Best in show!', 1.4, 1.0); haptic([20,60,20,60,40]); }
   function playBooster(){ tone(1046,0.15,'square',0.15,0); tone(1568,0.18,'square',0.15,100); haptic(25); }
 
-  const MASCOT_MESSAGES = ["Let's find your forever home!","You've got this, pup!","Sniff out the path ahead!","Every dog has its day!","Fetch that next level!","Paws crossed for you!"];
+  const MASCOT_MESSAGES = ["Let's find your forever home!","You've got this, pup!","Show them what you've got!","Every dog has its day!","Ready for the competition?","Paws crossed for you!"];
   function setMascotMessage(){
-    const el = document.getElementById('mascotSpeech');
-    if(el) el.textContent = MASCOT_MESSAGES[Math.floor(Math.random()*MASCOT_MESSAGES.length)];
+    const msg = MASCOT_MESSAGES[Math.floor(Math.random()*MASCOT_MESSAGES.length)];
+    const el1 = document.getElementById('mascotSpeech');
+    const el2 = document.getElementById('homeSpeech');
+    if(el1) el1.textContent = msg;
+    if(el2) el2.textContent = msg;
   }
 
   const LEVELS = [
@@ -968,7 +1005,45 @@
     return best;
   }
 
-  let state = { levelIndex:0, blocks:[], doors:[], initial:[], moves:0, history:[], highestUnlocked:0, score:0, combo:0, boosters:{paws:false,treat:false,double:false}, equippedBoosters:{paws:true,treat:true,double:true}, doubleActive:false, bossCompleted:false, isBoss:false, isEndless:false, endlessStreak:0, bossTimeLeft:60, bossTimerInterval:null };
+  const WARDROBE_ITEMS = [
+    { id:'bandana', name:'Bandana', unlockType:'always' },
+    { id:'cap', name:'Cap', unlockType:'streak', value:3 },
+    { id:'shades', name:'Shades', unlockType:'streak', value:5 },
+    { id:'bowtie', name:'Bow Tie', unlockType:'streak', value:8 },
+    { id:'crown', name:'Crown', unlockType:'streak', value:12 },
+    { id:'cape', name:'Cape', unlockType:'played', value:10 }
+  ];
+  function getBestStreak(){ return parseInt(localStorage.getItem('endlessBest')||'0',10); }
+  function getTotalPlayed(){ return parseInt(localStorage.getItem('totalCompetitions')||'0',10); }
+  function isItemUnlocked(item){
+    if(item.unlockType==='always') return true;
+    if(item.unlockType==='streak') return getBestStreak() >= item.value;
+    if(item.unlockType==='played') return getTotalPlayed() >= item.value;
+    return false;
+  }
+  function getEquipped(){
+    try{ return JSON.parse(localStorage.getItem('equippedWardrobe')||'[]'); }catch(e){ return []; }
+  }
+  function setEquipped(arr){ localStorage.setItem('equippedWardrobe', JSON.stringify(arr)); }
+  function wardrobeItemOverlayHTML(id){
+    switch(id){
+      case 'bandana': return '<div style="position:absolute;top:44px;left:16px;width:34px;height:13px;background:#E8425F;border:2.5px solid #3B2A20;border-radius:2px;clip-path:polygon(0 0,100% 0,100% 100%,50% 65%,0 100%);"></div>';
+      case 'cap': return '<div style="position:absolute;top:-11px;left:18px;width:64px;height:22px;background:#4FB8E8;border:2.5px solid #3B2A20;border-radius:50% 50% 0 0;"></div><div style="position:absolute;top:6px;left:12px;width:30px;height:7px;background:#4FB8E8;border:2.5px solid #3B2A20;border-radius:4px;"></div>';
+      case 'shades': return '<div style="position:absolute;top:21px;left:32px;width:16px;height:10px;background:#221833;border:2px solid #3B2A20;border-radius:4px;"></div><div style="position:absolute;top:21px;left:52px;width:16px;height:10px;background:#221833;border:2px solid #3B2A20;border-radius:4px;"></div><div style="position:absolute;top:25px;left:48px;width:6px;height:2px;background:#3B2A20;"></div>';
+      case 'bowtie': return '<div style="position:absolute;top:45px;left:37px;width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-right:10px solid #B47BE0;"></div><div style="position:absolute;top:45px;left:52px;width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:10px solid #B47BE0;"></div><div style="position:absolute;top:47px;left:47px;width:6px;height:6px;background:#8A5A12;border-radius:50%;"></div>';
+      case 'crown': return '<div style="position:absolute;top:-13px;left:26px;width:48px;height:16px;background:linear-gradient(160deg,#FFE49A,#E8B830);border:2.5px solid #3B2A20;clip-path:polygon(0 100%,0 40%,20% 70%,35% 20%,50% 60%,65% 20%,80% 70%,100% 40%,100% 100%);"></div>';
+      case 'cape': return '<div style="position:absolute;top:38px;left:6px;width:88px;height:52px;background:#E8304F;border:2.5px solid #3B2A20;border-radius:0 0 22px 22px;z-index:-1;opacity:.9;"></div>';
+      default: return '';
+    }
+  }
+  function renderWardrobeOnDog(targetId){
+    const overlay = document.getElementById(targetId);
+    if(!overlay) return;
+    overlay.innerHTML = '';
+    getEquipped().forEach(id => { overlay.innerHTML += wardrobeItemOverlayHTML(id); });
+  }
+
+  let state = { levelIndex:0, blocks:[], doors:[], initial:[], moves:0, history:[], highestUnlocked:0, score:0, combo:0, boosters:{paws:false,treat:false,double:false}, equippedBoosters:{paws:true,treat:true,double:true}, doubleActive:false, bossCompleted:false, isBoss:false, isEndless:false, endlessStreak:0, unlockedSnapshot:[], bossTimeLeft:60, bossTimerInterval:null };
   let blockEls = {};
 
   function occupiesCell(b,x,y){
@@ -1644,12 +1719,19 @@
   function showFail(){
     stopBossTimer();
     if(state.isEndless){
-      const prevBest = parseInt(localStorage.getItem('endlessBest')||'0',10);
+      const best = getBestStreak();
       const card = document.getElementById('failCard');
       card.style.borderColor = '#B0463F'; card.classList.remove('near-miss');
       document.getElementById('failTitle').textContent = 'Streak Over!';
       document.getElementById('failTitle').style.color = '#B0463F';
-      document.getElementById('failMsg').textContent = 'You reached a streak of ' + state.endlessStreak + '! Best ever: ' + Math.max(prevBest, state.endlessStreak) + '. Ready to beat it?';
+      let msgText = 'You reached a streak of ' + state.endlessStreak + '! Best ever: ' + best + '. Ready to beat it?';
+      const nowUnlocked = WARDROBE_ITEMS.filter(isItemUnlocked).map(i=>i.id);
+      const newlyUnlocked = nowUnlocked.filter(id => !state.unlockedSnapshot.includes(id));
+      if(newlyUnlocked.length){
+        const names = newlyUnlocked.map(id => WARDROBE_ITEMS.find(i=>i.id===id).name).join(', ');
+        msgText += ' New wardrobe item unlocked: ' + names + '! Check your Wardrobe.';
+      }
+      document.getElementById('failMsg').textContent = msgText;
       document.getElementById('retryBtn').textContent = 'Start New Streak';
       tone(300,0.15,'sawtooth',0.1,0); tone(200,0.18,'sawtooth',0.1,150); tone(140,0.22,'sawtooth',0.11,300);
       document.getElementById('failOverlay').classList.remove('hidden');
@@ -1697,6 +1779,9 @@
     state.isBoss = false;
     state.isEndless = true;
     state.endlessStreak = 0;
+    state.unlockedSnapshot = WARDROBE_ITEMS.filter(isItemUnlocked).map(i=>i.id);
+    localStorage.setItem('totalCompetitions', String(getTotalPlayed()+1));
+    document.getElementById('homeScreen').classList.add('hidden');
     nextEndlessLevel();
   }
   function nextEndlessLevel(){
@@ -1833,12 +1918,54 @@
 
   function showMap(){
     document.getElementById('gameScreen').classList.add('hidden');
-    document.getElementById('mapScreen').classList.remove('hidden');
-    renderMap();
+    document.getElementById('wardrobeScreen').classList.add('hidden');
+    document.getElementById('homeScreen').classList.remove('hidden');
     setMascotMessage();
-    document.getElementById('endlessBestLabel').textContent = localStorage.getItem('endlessBest') || '0';
+    document.getElementById('homeBestStreak').textContent = getBestStreak();
+    document.getElementById('homeTotalPlayed').textContent = getTotalPlayed();
+    renderWardrobeOnDog('wardrobeOverlay');
   }
-  document.getElementById('endlessCard').addEventListener('click', startEndless);
+  document.getElementById('enterCompBtn').addEventListener('click', startEndless);
+  document.getElementById('wardrobeBtn').addEventListener('click', () => {
+    document.getElementById('homeScreen').classList.add('hidden');
+    document.getElementById('wardrobeScreen').classList.remove('hidden');
+    renderWardrobeScreen();
+    renderWardrobeOnDog('wardrobePreviewOverlay');
+  });
+  document.getElementById('wardrobeBackBtn').addEventListener('click', showMap);
+  function renderWardrobeScreen(){
+    const grid = document.getElementById('wardrobeGrid');
+    grid.innerHTML = '';
+    const equipped = getEquipped();
+    WARDROBE_ITEMS.forEach(item => {
+      const unlocked = isItemUnlocked(item);
+      const isEquipped = equipped.includes(item.id);
+      const card = document.createElement('div');
+      card.style.cssText = 'background:'+(unlocked?'#FFFBF0':'#D8D0C4')+'; border:2.5px solid #3B2A20; border-radius:14px; padding:10px 4px; cursor:'+(unlocked?'pointer':'default')+'; text-align:center;' + (isEquipped?' box-shadow:0 0 0 3px rgba(123,201,111,0.6);':'');
+      let statusHTML;
+      if(!unlocked){
+        const lockText = item.unlockType==='streak' ? ('Streak '+item.value) : ('Play '+item.value+'x');
+        statusHTML = '<div style="font-size:9px; color:#B0463F; font-weight:700;">Locked: '+lockText+'</div>';
+      } else if(isEquipped){
+        statusHTML = '<div style="font-size:10px; color:#3B8C3B; font-weight:800;">✓ Worn</div>';
+      } else {
+        statusHTML = '<div style="font-size:10px; color:#8A7A6C;">Tap to wear</div>';
+      }
+      card.innerHTML = '<div style="font-weight:700; font-size:11px; margin-bottom:4px; color:#3B2A20;">'+item.name+'</div>' + statusHTML;
+      if(unlocked){
+        card.addEventListener('click', () => {
+          let eq = getEquipped();
+          if(eq.includes(item.id)) eq = eq.filter(x=>x!==item.id);
+          else eq.push(item.id);
+          setEquipped(eq);
+          renderWardrobeScreen();
+          renderWardrobeOnDog('wardrobePreviewOverlay');
+          ensureAudio(); tone(600,0.08,'sine',0.1,0);
+        });
+      }
+      grid.appendChild(card);
+    });
+  }
   const NODE_COORDS = [
     {x:160, y:30}, {x:80, y:150}, {x:230, y:270}, {x:70, y:390}, {x:200, y:510}, {x:150, y:615}
   ];
