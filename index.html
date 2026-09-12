@@ -189,6 +189,7 @@
   @keyframes popFloat{ 0%{ transform:translate(-50%,-50%) scale(0.5); opacity:0; } 25%{ transform:translate(-50%,-95%) scale(1.2); opacity:1;} 100%{ transform:translate(-50%,-170%) scale(1); opacity:0; } }
 
   footer{ display:flex; gap:7px; margin-top:auto; }
+  .action-btn.hidden{ display:none; }
   .action-btn{
     flex:1; padding:12px 6px; border-radius:13px; border:2.5px solid var(--ink);
     background: linear-gradient(160deg, #fff, var(--cream) 60%); color:var(--ink); font-family:'Poppins',sans-serif;
@@ -224,6 +225,19 @@
     background:linear-gradient(100deg, transparent, rgba(255,255,255,0.6), transparent); transform:skewX(-15deg); }
   @keyframes shimmerMove{ from{ left:-60%; } to{ left:160%; } }
   .shimmer.run{ animation: shimmerMove 1.1s ease-in-out; }
+  .chihuahua{ position:absolute; width:30px; height:30px; z-index:4; animation: chiTremble 0.4s ease-in-out infinite; }
+  .chihuahua .body{ position:absolute; bottom:0; left:6px; width:18px; height:16px; background:#E8C79A; border:2.5px solid var(--ink); border-radius:50%; }
+  .chihuahua .ear{ position:absolute; top:-2px; width:9px; height:14px; background:#D9A876; border:2px solid var(--ink); border-radius:50% 50% 50% 0; }
+  .chihuahua .ear.l{ left:2px; transform:rotate(-20deg); } .chihuahua .ear.r{ right:2px; transform:rotate(20deg) scaleX(-1); }
+  .chihuahua .eye{ position:absolute; top:8px; width:4px; height:4px; background:var(--ink); border-radius:50%; }
+  .chihuahua .eye.l{ left:9px;} .chihuahua .eye.r{ left:17px;}
+  @keyframes chiTremble{ 0%,100%{ transform:rotate(-2deg);} 50%{ transform:rotate(2deg);} }
+  .owner-anchor{ position:absolute; width:26px; height:34px; z-index:4; }
+  .owner-anchor .post{ position:absolute; bottom:0; left:11px; width:4px; height:24px; background:#8A5A12; border:1.5px solid var(--ink); }
+  .owner-anchor .hand{ position:absolute; top:0; left:2px; width:22px; height:16px; background:#F2C79A; border:2px solid var(--ink); border-radius:50% 50% 40% 40%; }
+  .rope-dot{ position:absolute; width:12px; height:12px; background:#C9975C; border:2px solid var(--ink); border-radius:4px; z-index:3; pointer-events:none; }
+  .rope-seg{ position:absolute; height:6px; background:#C9975C; border:2px solid var(--ink); border-radius:3px; transform-origin:0 50%; z-index:2; pointer-events:none; }
+  .leash-cell-tap{ position:absolute; cursor:pointer; z-index:6; }
   .treat-prop{ position:absolute; width:22px; height:22px; z-index:1; animation: treatBounce 1s ease-in-out infinite; pointer-events:none;
     filter: drop-shadow(0 0 5px rgba(255,212,71,0.7)); }
   .treat-prop .bone-shape{ position:relative; width:22px; height:9px; background:#F0E6D2; border:2px solid var(--ink); border-radius:4px; margin-top:6px; }
@@ -536,7 +550,7 @@
       <div class="level-info">Level <span id="levelNum">1</span><small id="levelSub">of 5</small></div>
       <div class="map-pill" id="mapBtn"><div class="mini-rosette"></div>Map</div>
     </header>
-    <div class="caption">Strut each pup down the runway to their matching rosette!</div>
+    <div class="caption" id="gameCaption">Strut each pup down the runway to their matching rosette!</div>
     <div class="goal-badge" id="goalBadge">Goal: clear in ≤5 moves</div>
     <div class="timer-wrap hidden" id="timerWrap">
       <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
@@ -572,6 +586,7 @@
 
     <footer>
       <button id="undoBtn" class="action-btn" disabled>Undo</button>
+      <button id="redrawLeashBtn" class="action-btn hidden" style="background:linear-gradient(160deg, rgba(255,255,255,.5), rgba(255,255,255,0) 50%), #C9975C;">↺ Redraw Leash</button>
     </footer>
   </div>
 
@@ -784,11 +799,11 @@
       ],
       doors:[ {side:'right', lane:2, color:'red'}, {side:'top', lane:4, color:'blue'} ], moveLimit:3, treats:[] },
     { blocks:[
-        {id:'a',color:'red',orient:'h',x:1,y:1,w:2},
-        {id:'b',color:'green',orient:'v',x:3,y:0,h:2},
-        {id:'c',color:'yellow',orient:'h',x:3,y:3,w:1}
+        {id:'a',color:'teal',orient:'v',x:2,y:3,h:2},
+        {id:'b',color:'purple',orient:'v',x:4,y:2,h:2}
       ],
-      doors:[ {side:'right', lane:1, color:'red'}, {side:'top', lane:3, color:'green'}, {side:'left', lane:3, color:'yellow'} ], moveLimit:4, treats:[{x:4,y:1}] },
+      doors:[ {side:'top', lane:2, color:'teal'}, {side:'bottom', lane:4, color:'purple'} ], moveLimit:3, treats:[],
+      leash:{ chihuahua:{x:0,y:4}, owner:{x:5,y:4} } },
     { blocks:[
         {id:'a',color:'orange',orient:'h',x:0,y:4,w:2},
         {id:'b',color:'teal',orient:'v',x:3,y:3,h:2},
@@ -839,7 +854,11 @@
   function occupiesCell(b,x,y){
     return b.orient==='h' ? (y===b.y && x>=b.x && x<b.x+b.w) : (x===b.x && y>=b.y && y<b.y+b.h);
   }
-  function isOccupied(x,y,excludeId){ return state.blocks.some(b => b.id!==excludeId && occupiesCell(b,x,y)); }
+  function isOccupied(x,y,excludeId){
+    if(state.blocks.some(b => b.id!==excludeId && occupiesCell(b,x,y))) return true;
+    if(state.leashCells && state.leashCells.some(c => c.x===x && c.y===y)) return true;
+    return false;
+  }
 
   function inBoundsMaxSlide(b, dir){
     let step = 0;
@@ -936,15 +955,23 @@
     state.moveLimit = cfg.moveLimit || 99;
     state.moves = 0; state.history = []; state.score = 0; state.combo = 0;
     state.boosters = {paws:false,treat:false,double:false}; state.doubleActive = false;
+    state.leashConfig = cfg.leash || null;
+    state.leashCells = [];
+    state.leashPath = [];
+    state.leashPhase = false;
     const gb = document.getElementById('goalBadge');
     gb.textContent = 'Goal: clear in ≤' + state.moveLimit + ' moves';
     gb.classList.remove('warn');
     updateMoveCounter(); updateScoreDisplay(); updateBoosterUI();
-    renderGridStatic();
-    rebuildBlocks();
     document.getElementById('mapScreen').classList.add('hidden');
     document.getElementById('loadoutScreen').classList.add('hidden');
     document.getElementById('gameScreen').classList.remove('hidden');
+    if(state.leashConfig){
+      startLeashPhase();
+    } else {
+      renderGridStatic();
+      rebuildBlocks();
+    }
   }
 
   function updateBoosterUI(){
@@ -1020,6 +1047,7 @@
     });
     renderBoardProps();
     renderTreats();
+    renderLeashVisual();
   }
 
   let treatEls = {};
@@ -1285,6 +1313,13 @@
   }
 
   document.getElementById('undoBtn').addEventListener('click', () => {
+    if(state.leashPhase){
+      if(state.leashPath.length <= 1) return;
+      state.leashPath.pop();
+      document.getElementById('undoBtn').disabled = state.leashPath.length <= 1;
+      renderLeashVisual();
+      return;
+    }
     const snap = state.history.pop();
     if(!snap) return;
     state.blocks = snap.blocks.map(b => ({...b}));
@@ -1295,6 +1330,114 @@
     document.getElementById('goalBadge').classList.toggle('warn', state.moves >= state.moveLimit);
     rebuildBlocks(); renderTreats();
   });
+  document.getElementById('redrawLeashBtn').addEventListener('click', () => {
+    state.blocks = state.initial.map(b => ({...b}));
+    state.moves = 0; state.history = []; state.score = 0; state.combo = 0;
+    state.treats.forEach(t => t.collected = false);
+    updateMoveCounter(); updateScoreDisplay();
+    document.getElementById('goalBadge').classList.remove('warn');
+    startLeashPhase();
+  });
+  function cellCenterPx(x,y){ return { px: x*CELL+CELL/2, py: y*CELL+CELL/2 }; }
+  function isAdjacent8(a,b){ return Math.abs(a.x-b.x)<=1 && Math.abs(a.y-b.y)<=1 && !(a.x===b.x && a.y===b.y); }
+  function cellInPath(x,y){ return state.leashPath.some(c=>c.x===x&&c.y===y); }
+  function occupiesAnyStartingBlock(x,y){ return state.initial.some(b => occupiesCell(b,x,y)); }
+
+  function renderLeashVisual(){
+    document.querySelectorAll('.chihuahua, .owner-anchor, .rope-dot, .rope-seg').forEach(el=>el.remove());
+    if(!state.leashConfig) return;
+    const grid = document.getElementById('grid');
+    const cfg = state.leashConfig;
+    const chi = document.createElement('div');
+    chi.className = 'chihuahua';
+    chi.innerHTML = '<div class="ear l"></div><div class="ear r"></div><div class="body"></div><div class="eye l"></div><div class="eye r"></div>';
+    const chiPx = cellCenterPx(cfg.chihuahua.x, cfg.chihuahua.y);
+    chi.style.left = (chiPx.px-15)+'px'; chi.style.top = (chiPx.py-15)+'px';
+    grid.appendChild(chi);
+    const owner = document.createElement('div');
+    owner.className = 'owner-anchor';
+    owner.innerHTML = '<div class="hand"></div><div class="post"></div>';
+    const ownerPx = cellCenterPx(cfg.owner.x, cfg.owner.y);
+    owner.style.left = (ownerPx.px-13)+'px'; owner.style.top = (ownerPx.py-17)+'px';
+    grid.appendChild(owner);
+    const path = state.leashPhase ? state.leashPath : state.leashCells;
+    if(path && path.length){
+      path.forEach(c => {
+        const px = cellCenterPx(c.x,c.y);
+        const dot = document.createElement('div');
+        dot.className='rope-dot';
+        dot.style.left=(px.px-6)+'px'; dot.style.top=(px.py-6)+'px';
+        grid.appendChild(dot);
+      });
+      for(let i=0;i<path.length-1;i++){
+        const p1 = cellCenterPx(path[i].x, path[i].y), p2 = cellCenterPx(path[i+1].x, path[i+1].y);
+        const dx = p2.px-p1.px, dy = p2.py-p1.py;
+        const len = Math.sqrt(dx*dx+dy*dy);
+        const ang = Math.atan2(dy,dx)*180/Math.PI;
+        const seg = document.createElement('div');
+        seg.className='rope-seg';
+        seg.style.left = p1.px+'px'; seg.style.top=(p1.py-3)+'px';
+        seg.style.width = len+'px';
+        seg.style.transform = 'rotate('+ang+'deg)';
+        grid.appendChild(seg);
+      }
+    }
+  }
+  function renderLeashTapTargets(){
+    document.querySelectorAll('.leash-cell-tap').forEach(el=>el.remove());
+    if(!state.leashPhase) return;
+    const grid = document.getElementById('grid');
+    for(let x=0;x<GRID_W;x++){
+      for(let y=0;y<GRID_H;y++){
+        const t = document.createElement('div');
+        t.className='leash-cell-tap';
+        t.style.left=(x*CELL)+'px'; t.style.top=(y*CELL)+'px'; t.style.width=CELL+'px'; t.style.height=CELL+'px';
+        t.addEventListener('click', () => handleLeashTap(x,y));
+        grid.appendChild(t);
+      }
+    }
+  }
+  function handleLeashTap(x,y){
+    if(!state.leashPhase) return;
+    const last = state.leashPath[state.leashPath.length-1];
+    if(x===last.x && y===last.y) return;
+    ensureAudio();
+    if(!isAdjacent8(last,{x,y})){ tone(200,0.1,'sine',0.08,0); return; }
+    if(occupiesAnyStartingBlock(x,y)){ tone(160,0.12,'sawtooth',0.08,0); return; }
+    if(cellInPath(x,y)) return;
+    state.leashPath.push({x,y});
+    document.getElementById('undoBtn').disabled = false;
+    tone(500,0.06,'sine',0.1,0);
+    renderLeashVisual();
+    const owner = state.leashConfig.owner;
+    if(x===owner.x && y===owner.y) finishLeashPhase();
+  }
+  function startLeashPhase(){
+    state.leashPhase = true;
+    state.leashCells = [];
+    state.leashPath = [{x:state.leashConfig.chihuahua.x, y:state.leashConfig.chihuahua.y}];
+    document.getElementById('gameCaption').textContent = 'Draw the leash! Tap cells to connect the pup to their owner (diagonals OK).';
+    document.getElementById('goalBadge').textContent = 'Connect the leash first!';
+    document.getElementById('undoBtn').textContent = 'Undo Step';
+    document.getElementById('undoBtn').disabled = true;
+    document.getElementById('redrawLeashBtn').classList.add('hidden');
+    renderGridStatic();
+    renderLeashTapTargets();
+    renderLeashVisual();
+  }
+  function finishLeashPhase(){
+    state.leashCells = state.leashPath.map(c=>({...c}));
+    state.leashPhase = false;
+    document.querySelectorAll('.leash-cell-tap').forEach(el=>el.remove());
+    document.getElementById('gameCaption').textContent = 'Leash secured! Now strut each pup to their matching rosette.';
+    document.getElementById('goalBadge').textContent = 'Goal: clear in ≤' + state.moveLimit + ' moves';
+    document.getElementById('undoBtn').textContent = 'Undo';
+    document.getElementById('undoBtn').disabled = true;
+    document.getElementById('redrawLeashBtn').classList.remove('hidden');
+    playExit(); haptic(20);
+    renderGridStatic();
+    rebuildBlocks();
+  }
   document.getElementById('resetBtn').addEventListener('click', () => {
     state.blocks = state.initial.map(b => ({...b}));
     state.moves = 0; state.history = []; state.score = 0; state.combo = 0;
