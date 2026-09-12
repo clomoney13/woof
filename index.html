@@ -329,6 +329,33 @@
 
   .diva{ position:relative; width:100px; height:150px; margin:0 auto; }
   .diva-instance .limb{ transform-box:fill-box; transform-origin:50% 0%; transition:transform .4s cubic-bezier(.34,1.56,.64,1); }
+
+  #showdownLaneWrap{ position:relative; margin:8px auto 20px; width:300px; }
+  #showdownLane{ position:relative; width:300px; height:460px; overflow:hidden; touch-action:none;
+    background: linear-gradient(180deg, #2E1F3D 0%, #4A2E5C 40%, #FFF7ED 100%);
+    border:3px solid var(--ink); border-radius:20px;
+    box-shadow: 0 10px 0 rgba(59,42,32,0.15), 0 16px 26px rgba(59,42,32,0.2); }
+  #villain{ position:absolute; top:14px; left:50%; transform:translateX(-50%); width:100px; height:110px; z-index:2; }
+  .villain-head{ position:absolute; top:0; left:20px; width:60px; height:54px; background:#D9B896; border:3px solid var(--ink); border-radius:50%; }
+  .villain-hair{ position:absolute; top:-14px; left:-4px; width:68px; height:34px; background:#2B1B14; border:3px solid var(--ink);
+    clip-path: polygon(0% 100%, 5% 20%, 30% 0%, 50% 15%, 70% 0%, 95% 20%, 100% 100%); }
+  .villain-brow{ position:absolute; top:20px; width:16px; height:3px; background:var(--ink); border-radius:2px; }
+  .villain-brow.l{ left:8px; transform:rotate(18deg); } .villain-brow.r{ right:8px; transform:rotate(-18deg); }
+  .villain-eye{ position:absolute; top:24px; width:6px; height:8px; background:var(--ink); border-radius:50%; }
+  .villain-eye.l{ left:14px;} .villain-eye.r{ right:14px;}
+  .villain-mouth{ position:absolute; top:38px; left:22px; width:16px; height:6px; border-bottom:3px solid var(--ink); border-radius:0 0 10px 10px; transform:rotate(180deg); }
+  .villain-body{ position:absolute; top:48px; left:14px; width:72px; height:50px; background:#3B1F5C; border:3px solid var(--ink); border-radius:16px 16px 8px 8px; }
+  .villain-arm{ position:absolute; top:52px; right:2px; width:34px; height:12px; background:#3B1F5C; border:3px solid var(--ink); border-radius:8px; transform-origin:left center; animation: villainThrow 1.4s ease-in-out infinite; }
+  @keyframes villainThrow{ 0%,70%,100%{ transform:rotate(10deg);} 82%{ transform:rotate(-55deg);} }
+  #showdownDog{ position:absolute; bottom:6px; width:64px; height:34px; background:linear-gradient(160deg, rgba(255,255,255,.6), rgba(255,255,255,0) 45%), var(--orange);
+    border:3px solid var(--ink); border-radius:999px; z-index:3; touch-action:none; }
+  #showdownDog::before{ content:''; position:absolute; right:-6px; top:50%; transform:translateY(-50%); width:16px; height:16px; background:inherit; border:3px solid var(--ink); border-radius:50%; }
+  #showdownDog::after{ content:''; position:absolute; right:-2px; top:6px; width:5px; height:5px; background:var(--ink); border-radius:50%; }
+  .throw-item{ position:absolute; width:26px; height:26px; pointer-events:none; z-index:2; }
+  .throw-item.bad{ background:#E8304F; border:2.5px solid var(--ink); border-radius:50% 50% 50% 0; }
+  .throw-item.bad::before{ content:''; position:absolute; top:-6px; left:8px; width:8px; height:8px; background:#3B8C3B; border-radius:2px; }
+  .throw-item.good{ background: radial-gradient(circle at 35% 30%, #fff, var(--gold) 65%); border:2.5px solid var(--ink);
+    clip-path: polygon(50% 0%,65% 35%,100% 50%,65% 65%,50% 100%,35% 65%,0% 50%,35% 35%); }
   .diva-instance.pose-celebrate .arm-left{ transform:rotate(140deg); }
   .diva-instance.pose-celebrate .arm-right{ transform:rotate(-140deg); }
   .diva-instance.pose-walk .leg-left{ transform:rotate(-18deg); }
@@ -522,10 +549,42 @@
 <div id="completeOverlay" class="overlay hidden">
   <div class="complete-card">
     <h2>Best in Show!</h2>
-    <p>You've cleared every runway on the circuit. One challenge stands between you and true fame — the hardest jam yet...</p>
-    <button id="enterBossBtn" class="primary-btn">Enter the Boss Round!</button>
+    <p>You've cleared every runway on the circuit. Now the rival handler wants a word — face them in the Showdown!</p>
+    <button id="enterBossBtn" class="primary-btn">Enter the Showdown!</button>
     <button id="skipBossBtn" class="action-btn" style="margin-top:8px;">Back to the map</button>
   </div>
+</div>
+
+<div id="showdownScreen" class="screen hidden">
+  <header>
+    <div class="wordmark">Showdown</div>
+    <div class="level-info">Beat the<br>Rival</div>
+    <div class="map-pill" id="showdownMapBtn"><div class="mini-rosette"></div>Map</div>
+  </header>
+  <div class="caption">Drag your pup to dodge the throws — catch the treats for bonus points!</div>
+  <div class="stat"><b class="score" id="showdownScoreVal">0</b> pts &nbsp;•&nbsp; Lives: <b id="showdownLivesVal">3</b> &nbsp;•&nbsp; Goal: <b>150</b></div>
+  <div id="showdownLaneWrap">
+    <div id="showdownLane">
+      <div id="villain">
+        <div class="villain-head">
+          <div class="villain-hair"></div>
+          <div class="villain-brow l"></div><div class="villain-brow r"></div>
+          <div class="villain-eye l"></div><div class="villain-eye r"></div>
+          <div class="villain-mouth"></div>
+        </div>
+        <div class="villain-body"></div>
+        <div class="villain-arm" id="villainArm"></div>
+      </div>
+      <div id="showdownDog"></div>
+    </div>
+  </div>
+</div>
+
+<div id="showdownWinOverlay" class="overlay hidden">
+  <div class="win-card"><h2>Showdown Won!</h2><p id="showdownWinStats"></p><button id="showdownWinContinue" class="primary-btn">Back to the Map</button></div>
+</div>
+<div id="showdownFailOverlay" class="overlay hidden">
+  <div class="win-card" style="border-color:#B0463F;"><h2 style="color:#B0463F;">The Rival Wins This Round!</h2><p>Every champion has an off day. Try again?</p><button id="showdownRetryBtn" class="primary-btn">Retry Showdown</button></div>
 </div>
 
 <script>
@@ -1197,8 +1256,118 @@
   });
   document.getElementById('enterBossBtn').addEventListener('click', () => {
     document.getElementById('completeOverlay').classList.add('hidden');
-    startBossPuzzle();
+    startShowdown();
   });
+
+  // ---- Boss Round: Showdown (dodge/catch, entirely separate from the sliding puzzle) ----
+  const SHOWDOWN_TARGET = 150, SHOWDOWN_DOG_WIDTH = 64;
+  let sd = { running:false, score:0, lives:3, dogX:150, items:[], itemId:0, spawnTimer:null, rafId:null };
+
+  function updateShowdownUI(){
+    document.getElementById('showdownScoreVal').textContent = sd.score;
+    document.getElementById('showdownLivesVal').textContent = sd.lives;
+  }
+  function clearShowdownItems(){
+    document.querySelectorAll('.throw-item').forEach(el => el.remove());
+  }
+  function startShowdown(){
+    ensureAudio();
+    if(sd.spawnTimer) clearInterval(sd.spawnTimer);
+    if(sd.rafId) cancelAnimationFrame(sd.rafId);
+    clearShowdownItems();
+    sd = { running:true, score:0, lives:3, dogX:150, items:[], itemId:0, spawnTimer:null, rafId:null };
+    updateShowdownUI();
+    document.getElementById('showdownDog').style.left = (150 - SHOWDOWN_DOG_WIDTH/2) + 'px';
+    document.getElementById('mapScreen').classList.add('hidden');
+    document.getElementById('gameScreen').classList.add('hidden');
+    document.getElementById('showdownScreen').classList.remove('hidden');
+    sd.spawnTimer = setInterval(spawnThrowItem, 700);
+    sd.rafId = requestAnimationFrame(showdownLoop);
+  }
+  function stopShowdown(){
+    sd.running = false;
+    clearInterval(sd.spawnTimer);
+    cancelAnimationFrame(sd.rafId);
+  }
+  function spawnThrowItem(){
+    if(!sd.running) return;
+    const isBad = Math.random() < 0.65;
+    const id = sd.itemId++;
+    const x = 20 + Math.random()*(300-46);
+    const el = document.createElement('div');
+    el.className = 'throw-item ' + (isBad ? 'bad' : 'good');
+    el.style.left = x+'px'; el.style.top = '75px';
+    document.getElementById('showdownLane').appendChild(el);
+    sd.items.push({ id, x, y:75, bad:isBad, el });
+  }
+  function showdownLoop(){
+    if(!sd.running) return;
+    const laneHeight = 460;
+    const dogY = laneHeight - 46;
+    const remaining = [];
+    sd.items.forEach(it => {
+      it.y += 3.6;
+      it.el.style.top = it.y+'px';
+      let remove = false;
+      if(it.y >= dogY && it.y <= dogY+36 && Math.abs(it.x - sd.dogX) < (SHOWDOWN_DOG_WIDTH/2+13)){
+        remove = true; it.el.remove();
+        if(it.bad){
+          sd.lives--; tone(160,0.15,'sawtooth',0.1,0); haptic([12,40,12]);
+        } else {
+          sd.score += 20; tone(1200,0.09,'triangle',0.14,0); haptic(18);
+          bark(BARKS[Math.floor(Math.random()*BARKS.length)]);
+        }
+        updateShowdownUI();
+      } else if(it.y > laneHeight+20){
+        remove = true; it.el.remove();
+      }
+      if(!remove) remaining.push(it);
+    });
+    sd.items = remaining;
+    if(sd.lives <= 0){ stopShowdown(); showShowdownFail(); return; }
+    if(sd.score >= SHOWDOWN_TARGET){ stopShowdown(); showShowdownWin(); return; }
+    sd.rafId = requestAnimationFrame(showdownLoop);
+  }
+  function showShowdownWin(){
+    state.bossCompleted = true;
+    document.getElementById('showdownWinStats').textContent = 'Final score: ' + sd.score + ' pts. The rival slinks away in defeat!';
+    document.getElementById('showdownWinOverlay').classList.remove('hidden');
+    playWin(); spawnConfetti();
+  }
+  function showShowdownFail(){
+    document.getElementById('showdownFailOverlay').classList.remove('hidden');
+    tone(300,0.15,'sawtooth',0.1,0); tone(200,0.18,'sawtooth',0.1,150); tone(140,0.22,'sawtooth',0.11,300);
+  }
+  document.getElementById('showdownWinContinue').addEventListener('click', () => {
+    document.getElementById('showdownWinOverlay').classList.add('hidden');
+    document.getElementById('showdownScreen').classList.add('hidden');
+    showMap();
+  });
+  document.getElementById('showdownRetryBtn').addEventListener('click', () => {
+    document.getElementById('showdownFailOverlay').classList.add('hidden');
+    startShowdown();
+  });
+  document.getElementById('showdownMapBtn').addEventListener('click', () => {
+    stopShowdown();
+    document.getElementById('showdownScreen').classList.add('hidden');
+    showMap();
+  });
+  (function setupShowdownDrag(){
+    const lane = document.getElementById('showdownLane');
+    const dogEl = document.getElementById('showdownDog');
+    let dragging = false;
+    function moveTo(clientX){
+      const rect = lane.getBoundingClientRect();
+      let x = clientX - rect.left;
+      x = Math.max(SHOWDOWN_DOG_WIDTH/2, Math.min(300 - SHOWDOWN_DOG_WIDTH/2, x));
+      sd.dogX = x;
+      dogEl.style.left = (x - SHOWDOWN_DOG_WIDTH/2) + 'px';
+    }
+    lane.addEventListener('pointerdown', e => { dragging = true; lane.setPointerCapture(e.pointerId); moveTo(e.clientX); });
+    lane.addEventListener('pointermove', e => { if(dragging) moveTo(e.clientX); });
+    lane.addEventListener('pointerup', () => { dragging = false; });
+    lane.addEventListener('pointercancel', () => { dragging = false; });
+  })();
 
   function showMap(){
     document.getElementById('gameScreen').classList.add('hidden');
@@ -1323,8 +1492,8 @@
       if(g.dataset.unlocked !== 'true') return;
       const i = parseInt(g.dataset.idx,10);
       const isBoss = g.dataset.boss === 'true';
-      g.addEventListener('click', () => { if(isBoss) startBossPuzzle(); else { state.levelIndex = i; startLevel(); } });
-      g.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(isBoss) startBossPuzzle(); else { state.levelIndex = i; startLevel(); } } });
+      g.addEventListener('click', () => { if(isBoss) startShowdown(); else { state.levelIndex = i; startLevel(); } });
+      g.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(isBoss) startShowdown(); else { state.levelIndex = i; startLevel(); } } });
     });
   }
   document.getElementById('mapBtn').addEventListener('click', () => { stopBossTimer(); showMap(); });
