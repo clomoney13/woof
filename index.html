@@ -207,6 +207,11 @@
   .booster-item.used{ cursor:default; }
   .booster-item.used .booster-circle{ opacity:.4; filter:grayscale(0.7); animation:none; }
   .booster-label{ font-size:8.5px; font-weight:700; color:var(--ink); text-align:center; line-height:1.1; }
+  .equip-item .booster-circle{ transition: opacity .2s, filter .2s, box-shadow .2s; }
+  .equip-item:not(.selected) .booster-circle{ opacity:.35; filter:grayscale(0.7); }
+  .equip-item.selected .booster-circle{ box-shadow:0 3px 0 rgba(59,42,32,.25), inset 0 3px 4px rgba(255,255,255,.4), 0 0 0 4px rgba(123,201,111,0.55); }
+  .equip-check{ position:absolute; top:-4px; right:-4px; width:16px; height:16px; border-radius:50%; background:var(--green); border:2px solid var(--ink); align-items:center; justify-content:center; color:#fff; font-size:10px; font-weight:800; display:none; }
+  .equip-item.selected .equip-check{ display:flex; }
   .mini-paw-icon{ position:relative; width:22px; height:18px; }
   .mini-paw-icon i{ position:absolute; top:0; width:7px; height:8px; background:#fff; border:1.5px solid var(--ink); border-radius:50%; }
   .mini-paw-icon i:nth-child(1){ left:0; } .mini-paw-icon i:nth-child(2){ left:7px; top:-3px; } .mini-paw-icon i:nth-child(3){ left:14px; }
@@ -490,6 +495,41 @@
     </div>
   </div>
 
+  <div id="loadoutScreen" class="screen hidden" style="align-items:center; text-align:center;">
+    <div class="map-title" style="font-size:22px;">Get Ready!</div>
+    <div class="map-sub" id="loadoutLevelLabel">Level 1</div>
+    <div class="mascot-wrap">
+      <div class="speech-bubble">Pick your boosters, champ!</div>
+      <div class="mascot" id="mascotLoadout"></div>
+    </div>
+    <div class="booster-tray" id="loadoutBoosterTray" style="margin:10px 0 18px;">
+      <div class="booster-item equip-item" id="equipPaws" data-key="paws">
+        <div class="booster-circle" style="background:linear-gradient(160deg, rgba(255,255,255,.5), rgba(255,255,255,0) 45%), var(--gold);">
+          <div class="mini-paw-icon"><i></i><i></i><i></i><div class="pad"></div></div>
+          <div class="equip-check">✓</div>
+        </div>
+        <div class="booster-label">Power<br>Paws</div>
+      </div>
+      <div class="booster-item equip-item" id="equipTreat" data-key="treat">
+        <div class="booster-circle" style="background:linear-gradient(160deg, rgba(255,255,255,.5), rgba(255,255,255,0) 45%), #D9A85C;">
+          <svg viewBox="0 0 40 40" style="width:26px;height:26px;"><use href="#icon-bone"/></svg>
+          <div class="equip-check">✓</div>
+        </div>
+        <div class="booster-label">Treat<br>Toss</div>
+      </div>
+      <div class="booster-item equip-item" id="equipDouble" data-key="double">
+        <div class="booster-circle" style="background:linear-gradient(160deg, rgba(255,255,255,.5), rgba(255,255,255,0) 45%), var(--pink);">
+          <span style="font-family:'Baloo 2',sans-serif; font-weight:800; color:#fff; font-size:18px;">2×</span>
+          <div class="equip-check">✓</div>
+        </div>
+        <div class="booster-label">Double<br>Treats</div>
+      </div>
+    </div>
+    <div class="caption" style="font-size:11px;">Tap a booster to bring it — or leave it behind for a bigger challenge!</div>
+    <button id="startLevelBtn" class="primary-btn" style="max-width:260px; margin-top:16px;">Start Level!</button>
+    <button id="loadoutBackBtn" class="action-btn" style="max-width:260px; margin-top:10px;">Back to Map</button>
+  </div>
+
   <div id="gameScreen" class="screen hidden">
     <header>
       <div class="wordmark" id="wordmarkGame">Best in Show</div>
@@ -659,7 +699,7 @@
       '<div class="mascot-eye l"></div><div class="mascot-eye r"></div>' +
       '<div class="mascot-nose"></div><div class="mascot-tongue"></div>';
   }
-  ['mascotDog','mascotWin'].forEach(id => {
+  ['mascotDog','mascotWin','mascotLoadout'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.innerHTML = dogHTML();
   });
@@ -793,7 +833,7 @@
     treats:[{x:3,y:2},{x:2,y:4}]
   };
 
-  let state = { levelIndex:0, blocks:[], doors:[], initial:[], moves:0, history:[], highestUnlocked:0, score:0, combo:0, boosters:{paws:false,treat:false,double:false}, doubleActive:false, bossCompleted:false, isBoss:false, bossTimeLeft:60, bossTimerInterval:null };
+  let state = { levelIndex:0, blocks:[], doors:[], initial:[], moves:0, history:[], highestUnlocked:0, score:0, combo:0, boosters:{paws:false,treat:false,double:false}, equippedBoosters:{paws:true,treat:true,double:true}, doubleActive:false, bossCompleted:false, isBoss:false, bossTimeLeft:60, bossTimerInterval:null };
   let blockEls = {};
 
   function occupiesCell(b,x,y){
@@ -903,14 +943,38 @@
     renderGridStatic();
     rebuildBlocks();
     document.getElementById('mapScreen').classList.add('hidden');
+    document.getElementById('loadoutScreen').classList.add('hidden');
     document.getElementById('gameScreen').classList.remove('hidden');
   }
 
   function updateBoosterUI(){
-    document.getElementById('boosterPaws').classList.toggle('used', state.boosters.paws);
-    document.getElementById('boosterTreat').classList.toggle('used', state.boosters.treat);
-    document.getElementById('boosterDouble').classList.toggle('used', state.boosters.double);
+    document.getElementById('boosterPaws').classList.toggle('used', state.boosters.paws || !state.equippedBoosters.paws);
+    document.getElementById('boosterTreat').classList.toggle('used', state.boosters.treat || !state.equippedBoosters.treat);
+    document.getElementById('boosterDouble').classList.toggle('used', state.boosters.double || !state.equippedBoosters.double);
   }
+
+  function showLoadout(){
+    document.getElementById('mapScreen').classList.add('hidden');
+    document.getElementById('loadoutScreen').classList.remove('hidden');
+    document.getElementById('loadoutLevelLabel').textContent = 'Level ' + (state.levelIndex+1);
+    document.querySelectorAll('.equip-item').forEach(item => {
+      const key = item.dataset.key;
+      item.classList.toggle('selected', state.equippedBoosters[key]);
+    });
+  }
+  document.querySelectorAll('.equip-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const key = item.dataset.key;
+      state.equippedBoosters[key] = !state.equippedBoosters[key];
+      item.classList.toggle('selected', state.equippedBoosters[key]);
+      ensureAudio(); tone(state.equippedBoosters[key] ? 700 : 300, 0.08, 'sine', 0.1, 0);
+    });
+  });
+  document.getElementById('startLevelBtn').addEventListener('click', startLevel);
+  document.getElementById('loadoutBackBtn').addEventListener('click', () => {
+    document.getElementById('loadoutScreen').classList.add('hidden');
+    showMap();
+  });
 
   function darkenHex(hex, factor){
     hex = hex.replace('#','');
@@ -1241,7 +1305,7 @@
     rebuildBlocks(); renderTreats();
   });
   document.getElementById('boosterPaws').addEventListener('click', () => {
-    if(state.boosters.paws) return;
+    if(state.boosters.paws || !state.equippedBoosters.paws) return;
     const target = state.blocks.find(b => canExitNow(b) !== null);
     if(!target) return;
     state.boosters.paws = true; updateBoosterUI();
@@ -1250,7 +1314,7 @@
     commitMove(target, dir, blockEls[target.id]);
   });
   document.getElementById('boosterTreat').addEventListener('click', () => {
-    if(state.boosters.treat) return;
+    if(state.boosters.treat || !state.equippedBoosters.treat) return;
     state.boosters.treat = true; updateBoosterUI();
     ensureAudio(); playBooster();
     state.blocks.forEach(b => {
@@ -1261,7 +1325,7 @@
     });
   });
   document.getElementById('boosterDouble').addEventListener('click', () => {
-    if(state.boosters.double) return;
+    if(state.boosters.double || !state.equippedBoosters.double) return;
     state.boosters.double = true; state.doubleActive = true; updateBoosterUI();
     ensureAudio(); playBooster();
     spawnPointPopup(ORIGIN+144, ORIGIN+144, '2× READY!', '#FF5A5F');
@@ -1580,8 +1644,8 @@
       if(g.dataset.unlocked !== 'true') return;
       const i = parseInt(g.dataset.idx,10);
       const isBoss = g.dataset.boss === 'true';
-      g.addEventListener('click', () => { if(isBoss) startShowdown(); else { state.levelIndex = i; startLevel(); } });
-      g.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(isBoss) startShowdown(); else { state.levelIndex = i; startLevel(); } } });
+      g.addEventListener('click', () => { if(isBoss) startShowdown(); else { state.levelIndex = i; showLoadout(); } });
+      g.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(isBoss) startShowdown(); else { state.levelIndex = i; showLoadout(); } } });
     });
   }
   document.getElementById('mapBtn').addEventListener('click', () => { stopBossTimer(); showMap(); });
