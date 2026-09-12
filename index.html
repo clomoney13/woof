@@ -50,7 +50,7 @@
   .paw-deco i{ position:absolute; top:0; width:5px; height:6px; background:#C98F4E; border:1.5px solid var(--ink); border-radius:50%; }
   .paw-deco i:nth-child(1){ left:0; } .paw-deco i:nth-child(2){ left:5px; top:-2px; } .paw-deco i:nth-child(3){ left:10px; }
 
-  #app{ position:relative; z-index:1; width:100%; max-width:480px; min-height:100vh; display:flex; flex-direction:column; padding:34px 16px 28px; }
+  #app{ position:relative; z-index:1; width:100%; max-width:480px; min-height:100vh; display:flex; flex-direction:column; padding:34px 16px 16px; }
   #app.bouncehit{ animation: bounceHit .3s ease; }
   @keyframes bounceHit{ 0%,100%{transform:scale(1) translateY(0);} 45%{transform:scale(1.02) translateY(-3px);} }
   #flash{ position:fixed; inset:0; background: radial-gradient(circle at 50% 25%, rgba(255,212,71,0.5), transparent 65%); opacity:0; pointer-events:none; z-index:50; }
@@ -99,11 +99,11 @@
   .icon-btn:focus-visible, .action-btn:focus-visible, .primary-btn:focus-visible, .map-node:focus-visible{ outline:3px solid var(--red); outline-offset:2px; }
 
   .caption{
-    text-align:center; color:var(--ink); font-weight:700; font-size:12.5px; margin:12px auto 4px;
-    background: var(--cream); border:2px solid var(--ink); border-radius:20px; padding:6px 14px; max-width:300px;
+    text-align:center; color:var(--ink); font-weight:700; font-size:12px; margin:8px auto 4px;
+    background: var(--cream); border:2px solid var(--ink); border-radius:20px; padding:5px 14px; max-width:300px;
   }
-  .goal-badge{ text-align:center; color:#fff; font-weight:700; font-size:11.5px; margin:0 auto 8px;
-    background: var(--red); border:2px solid var(--ink); border-radius:16px; padding:4px 12px; max-width:220px; font-family:'Baloo 2',sans-serif; }
+  .goal-badge{ text-align:center; color:#fff; font-weight:700; font-size:11px; margin:0 auto 6px;
+    background: var(--red); border:2px solid var(--ink); border-radius:16px; padding:3px 12px; max-width:220px; font-family:'Baloo 2',sans-serif; }
   .goal-badge.warn{ background:#B0463F; animation: bshake .3s ease; }
   .timer-wrap{ display:flex; align-items:center; gap:8px; max-width:280px; margin:0 auto 10px; }
   .timer-wrap.hidden{ display:none; }
@@ -113,11 +113,11 @@
   @keyframes timerPulse{ 0%,100%{ opacity:1;} 50%{ opacity:.55;} }
   .timer-text{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:14px; color:var(--ink); min-width:34px; }
   .timer-text.danger{ color:#B0463F; animation: timerPulse .4s ease-in-out infinite; }
-  .stat{ font-size:12.5px; color:var(--ink); text-align:center; margin-bottom:10px; font-weight:600; }
+  .stat{ font-size:12px; color:var(--ink); text-align:center; margin-bottom:6px; font-weight:600; }
   .stat b{ color:var(--red); font-size:17px; }
   .stat .score{ color:var(--gold); font-size:19px; }
 
-  #boardWrap{ position:relative; margin: 8px auto 24px; width: 336px; height: 336px; }
+  #boardWrap{ position:relative; margin: 6px auto 10px; width: 336px; height: 336px; }
   .grid{
     position:absolute; left:24px; top:24px; width:288px; height:288px;
     background-color: var(--cream);
@@ -198,15 +198,15 @@
   .action-btn:disabled{ opacity:0.4; cursor:default; }
   .hint-btn{ background: linear-gradient(160deg, rgba(255,255,255,.5), rgba(255,255,255,0) 50%), var(--purple); color:#fff; }
   .booster-btn{ background: linear-gradient(160deg, rgba(255,255,255,.6), rgba(255,255,255,0) 50%), var(--gold); color:var(--ink); }
-  .booster-tray{ display:flex; justify-content:center; gap:16px; margin:2px 0 12px; }
-  .booster-item{ display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; }
-  .booster-circle{ width:54px; height:54px; border-radius:50%; border:3px solid var(--ink); display:flex; align-items:center; justify-content:center; position:relative;
-    box-shadow:0 4px 0 rgba(59,42,32,.25), inset 0 3px 4px rgba(255,255,255,.4); animation: readyGlow 1.8s ease-in-out infinite; }
-  @keyframes readyGlow{ 0%,100%{ box-shadow:0 4px 0 rgba(59,42,32,.25), inset 0 3px 4px rgba(255,255,255,.4), 0 0 0 0 rgba(255,212,71,.5);} 50%{ box-shadow:0 4px 0 rgba(59,42,32,.25), inset 0 3px 4px rgba(255,255,255,.4), 0 0 0 6px rgba(255,212,71,0);} }
+  .booster-tray{ display:flex; justify-content:center; gap:14px; margin:0 0 8px; }
+  .booster-item{ display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; }
+  .booster-circle{ width:44px; height:44px; border-radius:50%; border:3px solid var(--ink); display:flex; align-items:center; justify-content:center; position:relative;
+    box-shadow:0 3px 0 rgba(59,42,32,.25), inset 0 3px 4px rgba(255,255,255,.4); animation: readyGlow 1.8s ease-in-out infinite; }
+  @keyframes readyGlow{ 0%,100%{ box-shadow:0 3px 0 rgba(59,42,32,.25), inset 0 3px 4px rgba(255,255,255,.4), 0 0 0 0 rgba(255,212,71,.5);} 50%{ box-shadow:0 3px 0 rgba(59,42,32,.25), inset 0 3px 4px rgba(255,255,255,.4), 0 0 0 5px rgba(255,212,71,0);} }
   .booster-item:active .booster-circle{ transform:translateY(2px); }
   .booster-item.used{ cursor:default; }
   .booster-item.used .booster-circle{ opacity:.4; filter:grayscale(0.7); animation:none; }
-  .booster-label{ font-size:9.5px; font-weight:700; color:var(--ink); text-align:center; line-height:1.15; }
+  .booster-label{ font-size:8.5px; font-weight:700; color:var(--ink); text-align:center; line-height:1.1; }
   .mini-paw-icon{ position:relative; width:22px; height:18px; }
   .mini-paw-icon i{ position:absolute; top:0; width:7px; height:8px; background:#fff; border:1.5px solid var(--ink); border-radius:50%; }
   .mini-paw-icon i:nth-child(1){ left:0; } .mini-paw-icon i:nth-child(2){ left:7px; top:-3px; } .mini-paw-icon i:nth-child(3){ left:14px; }
@@ -493,7 +493,7 @@
       <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
       <div class="timer-text" id="timerText">0:60</div>
     </div>
-    <div class="candy-strip" style="width:120px; margin:0 auto 10px;"></div>
+    <div class="candy-strip" style="width:120px; margin:0 auto 6px;"></div>
     <div class="stat"><b class="score" id="scoreVal">0</b> pts &nbsp;•&nbsp; <b id="moveCount">0</b> moves &nbsp;•&nbsp; <button id="resetBtn" class="icon-btn" aria-label="Reset level" title="Reset level" style="display:inline-flex; vertical-align:middle; margin-left:6px;">↺</button></div>
 
     <div class="booster-tray">
@@ -523,7 +523,6 @@
 
     <footer>
       <button id="undoBtn" class="action-btn" disabled>Undo</button>
-      <button id="hintBtn" class="action-btn hint-btn">▶ Watch ad for hint</button>
     </footer>
   </div>
 
@@ -542,9 +541,6 @@
     <p>This one needs a cleverer path through the jam. Want to try again?</p>
     <button id="retryBtn" class="primary-btn">Retry Level</button>
   </div>
-</div>
-<div id="adOverlay" class="overlay hidden">
-  <div class="ad-card"><div class="ad-spinner"></div><p>Ad playing… (placeholder — real rewarded-video SDK call goes here)</p></div>
 </div>
 <div id="completeOverlay" class="overlay hidden">
   <div class="complete-card">
@@ -1219,17 +1215,6 @@
     document.getElementById('undoBtn').disabled = true;
     document.getElementById('goalBadge').classList.remove('warn');
     rebuildBlocks(); renderTreats();
-  });
-  document.getElementById('hintBtn').addEventListener('click', () => {
-    ensureAudio();
-    const overlay = document.getElementById('adOverlay');
-    overlay.classList.remove('hidden');
-    setTimeout(() => {
-      overlay.classList.add('hidden');
-      let target = state.blocks.find(b => canExitNow(b) !== null) || state.blocks[0];
-      const el = blockEls[target.id];
-      if(el){ el.classList.add('hint'); setTimeout(() => el.classList.remove('hint'), 1500); }
-    }, 1300);
   });
   document.getElementById('boosterPaws').addEventListener('click', () => {
     if(state.boosters.paws) return;
