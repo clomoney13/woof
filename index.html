@@ -242,6 +242,14 @@
 
   .duo-stage{ display:flex; align-items:flex-end; justify-content:center; gap:18px; margin:8px 0 4px; min-height:112px; }
   .owner-figure{ position:relative; width:66px; height:108px; flex-shrink:0; }
+  .strike-pose{ animation: strikePose 0.6s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes strikePose{
+    0%{ transform:scale(1) rotate(0deg); }
+    30%{ transform:scale(1.08) rotate(-4deg); }
+    55%{ transform:scale(1.05) rotate(3deg); }
+    75%{ transform:scale(1.08) rotate(-2deg); }
+    100%{ transform:scale(1) rotate(0deg); }
+  }
   .owner-hair{ position:absolute; top:-3px; left:13px; width:38px; height:20px; background:#8A5A3C; border:2.5px solid var(--ink); border-radius:50% 50% 15% 15%; z-index:1; }
   .owner-head{ position:absolute; top:2px; left:15px; width:32px; height:30px; background:#F2C79A; border:2.5px solid var(--ink); border-radius:50%; z-index:2; }
   .owner-eye{ position:absolute; top:14px; width:3px; height:4px; background:var(--ink); border-radius:50%; }
@@ -559,11 +567,10 @@
       <div class="tab-btn active" id="wardrobeTabDog" style="color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.5);">Dog</div>
       <div class="tab-btn" id="wardrobeTabOwner" style="color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.5);">Owner</div>
     </div>
-    <div style="position:relative; width:150px; height:130px; margin:60px auto 0; position:relative; z-index:1;">
-      <div id="heroDogWardrobe" style="width:100%; height:100%;"></div>
-      <div class="owner-figure hidden" id="ownerWardrobePreview" style="position:absolute; top:0; left:0; width:100%; height:100%;"></div>
+    <div style="position:relative; width:100%; flex:1; margin-top:10px; z-index:1; display:flex; align-items:flex-end; justify-content:center;">
+      <div id="heroDogWardrobe" style="width:220px; height:100px;"></div>
+      <div class="owner-figure hidden" id="ownerWardrobePreview" style="position:absolute; bottom:0; width:220px; height:380px;"></div>
     </div>
-    <div style="flex:1;"></div>
     <div style="background:rgba(255,251,240,0.92); border-top:3px solid var(--ink); border-radius:22px 22px 0 0; padding:12px 14px 16px; width:100%; position:relative; z-index:1; box-shadow:0 -4px 16px rgba(0,0,0,0.15);">
       <div class="caption" id="wardrobeCaption" style="margin:0 auto 8px;">Tap an unlocked item to try it on!</div>
       <div id="wardrobeGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; max-width:300px; margin:0 auto 10px;"></div>
@@ -804,12 +811,12 @@
   const DOG_HERO_URL = 'https://raw.githubusercontent.com/clomoney13/woof/main/assets/dog-hero.png';
   function dogAccessoryHTML(id){
     switch(id){
-      case 'cap': return '<div style="position:absolute; top:-18%; left:0%; width:38%; height:38%; background:#4FB8E8; border:2.5px solid #3B2A20; border-radius:50% 50% 20% 20%; z-index:3;"></div>';
-      case 'crown': return '<div style="position:absolute; top:-20%; left:2%; width:32%; height:30%; background:#E8B830; border:2.5px solid #3B2A20; clip-path:polygon(0 100%,0 30%,20% 60%,50% 0%,80% 60%,100% 30%,100% 100%); z-index:3;"></div>';
-      case 'shades': return '<div style="position:absolute; top:22%; left:6%; width:16%; height:14%; background:#221833; border:2px solid #3B2A20; border-radius:5px; z-index:3;"></div>';
-      case 'bandana': return '<div style="position:absolute; top:40%; left:20%; width:18%; height:26%; background:#E8425F; border:2.5px solid #3B2A20; clip-path:polygon(0 0,100% 0,50% 100%); z-index:3;"></div>';
-      case 'bowtie': return '<div style="position:absolute; top:44%; left:22%; width:14%; height:14%; z-index:3; display:flex; align-items:center; justify-content:center;"><div style="width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:9px solid #B47BE0;"></div><div style="width:6px;height:6px;background:#8A5A12;border-radius:50%;"></div><div style="width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:9px solid #B47BE0;"></div></div>';
-      case 'cape': return '<div style="position:absolute; top:20%; left:32%; width:60%; height:75%; background:#E8304F; border:2.5px solid #3B2A20; border-radius:0 0 30px 30px; opacity:0.9; z-index:0;"></div>';
+      case 'cap': return '<div style="position:absolute; top:0%; left:2.8%; width:23.9%; height:15%; background:#4FB8E8; border:2.5px solid #3B2A20; border-radius:50% 50% 20% 20%; z-index:3;"></div>';
+      case 'crown': return '<div style="position:absolute; top:-6%; left:3%; width:22%; height:19%; background:#E8B830; border:2.5px solid #3B2A20; clip-path:polygon(0 100%,0 30%,20% 60%,50% 0%,80% 60%,100% 30%,100% 100%); z-index:3;"></div>';
+      case 'shades': return '<div style="position:absolute; top:18.1%; left:11%; width:9.9%; height:8.75%; background:#221833; border:2px solid #3B2A20; border-radius:4px; z-index:3;"></div>';
+      case 'bandana': return '<div style="position:absolute; top:35.9%; left:21.8%; width:8.5%; height:15.6%; background:#E8425F; border:2.5px solid #3B2A20; clip-path:polygon(0 0,100% 0,50% 100%); z-index:3;"></div>';
+      case 'bowtie': return '<div style="position:absolute; top:37%; left:22%; width:9%; height:9%; z-index:3; display:flex; align-items:center; justify-content:center;"><div style="width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:9px solid #B47BE0;"></div><div style="width:6px;height:6px;background:#8A5A12;border-radius:50%;"></div><div style="width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:9px solid #B47BE0;"></div></div>';
+      case 'cape': return '<div style="position:absolute; top:40.6%; left:26.8%; width:60.6%; height:40.6%; background:#E8304F; border:2.5px solid #3B2A20; border-radius:0 0 30px 30px; opacity:0.9; z-index:0;"></div>';
       default: return '';
     }
   }
@@ -1069,7 +1076,8 @@
         const orient = Math.random() < 0.5 ? 'h' : 'v';
         const len = Math.random() < 0.55 ? 2 : 1;
         let placed = false;
-        for(let t=0; t<50 && !placed; t++){
+        let bestCandidate = null, bestScore = -1;
+        for(let t=0; t<50; t++){
           const maxX = orient==='h' ? gridW-len : gridW-1;
           const maxY = orient==='v' ? gridH-len : gridH-1;
           const x = Math.floor(Math.random()*(maxX+1));
@@ -1077,14 +1085,26 @@
           const cells = [];
           for(let k=0;k<len;k++) cells.push(orient==='h' ? [x+k,y] : [x,y+k]);
           if(cells.every(([cx,cy]) => !occupied.has(cx+','+cy))){
-            cells.forEach(([cx,cy]) => occupied.add(cx+','+cy));
-            const b = { id:'g'+i, color:shuffled[i%shuffled.length], orient, x, y, w:(orient==='h'?len:1), h:(orient==='v'?len:1) };
-            blocks.push(b);
-            const side = orient==='h' ? (Math.random()<0.5?'left':'right') : (Math.random()<0.5?'top':'bottom');
-            const lane = orient==='h' ? y : x;
-            doors.push({ side, lane, color:b.color });
-            placed = true;
+            const cx = orient==='h' ? x+len/2 : x+0.5;
+            const cy = orient==='v' ? y+len/2 : y+0.5;
+            let minDist = blocks.length===0 ? 99 : Math.min(...blocks.map(bl => {
+              const bcx = bl.orient==='h' ? bl.x+bl.w/2 : bl.x+0.5;
+              const bcy = bl.orient==='v' ? bl.y+bl.h/2 : bl.y+0.5;
+              return Math.hypot(cx-bcx, cy-bcy);
+            }));
+            if(minDist > bestScore){ bestScore = minDist; bestCandidate = {x,y}; }
           }
+        }
+        if(bestCandidate){
+          const cells = [];
+          for(let k=0;k<len;k++) cells.push(orient==='h' ? [bestCandidate.x+k,bestCandidate.y] : [bestCandidate.x,bestCandidate.y+k]);
+          cells.forEach(([cx,cy]) => occupied.add(cx+','+cy));
+          const b = { id:'g'+i, color:shuffled[i%shuffled.length], orient, x:bestCandidate.x, y:bestCandidate.y, w:(orient==='h'?len:1), h:(orient==='v'?len:1) };
+          blocks.push(b);
+          const side = orient==='h' ? (Math.random()<0.5?'left':'right') : (Math.random()<0.5?'top':'bottom');
+          const lane = orient==='h' ? bestCandidate.y : bestCandidate.x;
+          doors.push({ side, lane, color:b.color });
+          placed = true;
         }
         if(!placed){ ok=false; break; }
       }
@@ -1152,9 +1172,9 @@
   function setEquippedOwner(arr){ localStorage.setItem('equippedOwner', JSON.stringify(arr)); }
   function ownerItemOverlayHTML(id){
     switch(id){
-      case 'sunhat': return '<div style="position:absolute; top:-6%; left:8%; width:84%; height:16%; background:#FFD447; border:2.5px solid #3B2A20; border-radius:50%; z-index:3;"></div>';
-      case 'bow': return '<div style="position:absolute; top:27%; left:32%; width:36%; height:8%; z-index:3; display:flex; align-items:center; justify-content:center;"><div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-right:11px solid #FF5A5F;"></div><div style="width:8px;height:8px;background:#8A5A12;border-radius:50%;margin:0 -1px;"></div><div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:11px solid #FF5A5F;"></div></div>';
-      case 'sparkledress': return '<div style="position:absolute; top:30%; left:15%; font-size:18px; z-index:3;">✦</div><div style="position:absolute; top:45%; left:65%; font-size:14px; z-index:3;">✦</div><div style="position:absolute; top:60%; left:25%; font-size:16px; z-index:3;">✦</div>';
+      case 'sunhat': return '<div style="position:absolute; top:-3.6%; left:7.7%; width:76.5%; height:9.6%; background:#FFD447; border:2.5px solid #3B2A20; border-radius:50%; z-index:3;"></div>';
+      case 'bow': return '<div style="position:absolute; top:30.8%; left:35.7%; width:25.5%; height:4.8%; z-index:3; display:flex; align-items:center; justify-content:center;"><div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-right:11px solid #FF5A5F;"></div><div style="width:8px;height:8px;background:#8A5A12;border-radius:50%;margin:0 -1px;"></div><div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:11px solid #FF5A5F;"></div></div>';
+      case 'sparkledress': return '<div style="position:absolute; top:32%; left:22%; font-size:18px; z-index:3;">✦</div><div style="position:absolute; top:42%; left:62%; font-size:14px; z-index:3;">✦</div><div style="position:absolute; top:52%; left:30%; font-size:16px; z-index:3;">✦</div>';
       default: return '';
     }
   }
@@ -1382,19 +1402,36 @@
   }
   function rosetteSVG(color){
     const dark = darkenHex(color, 0.7);
-    return '<svg viewBox="0 0 40 40" style="width:100%;height:100%;overflow:visible;">' +
-      '<g stroke="'+dark+'" stroke-width="1.2">' +
-        '<ellipse cx="20" cy="19" rx="15" ry="6" fill="'+color+'" transform="rotate(0 20 19)"/>' +
-        '<ellipse cx="20" cy="19" rx="15" ry="6" fill="'+color+'" transform="rotate(30 20 19)"/>' +
-        '<ellipse cx="20" cy="19" rx="15" ry="6" fill="'+color+'" transform="rotate(60 20 19)"/>' +
-        '<ellipse cx="20" cy="19" rx="15" ry="6" fill="'+color+'" transform="rotate(90 20 19)"/>' +
-        '<ellipse cx="20" cy="19" rx="15" ry="6" fill="'+color+'" transform="rotate(120 20 19)"/>' +
-        '<ellipse cx="20" cy="19" rx="15" ry="6" fill="'+color+'" transform="rotate(150 20 19)"/>' +
-      '</g>' +
-      '<polygon points="14,26 19,26 15,39 12,37" fill="'+dark+'"/>' +
-      '<polygon points="26,26 21,26 25,39 28,37" fill="'+dark+'"/>' +
-      '<circle cx="20" cy="19" r="9" fill="url(#gold)" stroke="#8A5A12" stroke-width="1"/>' +
-      '<ellipse cx="17" cy="16" rx="2.6" ry="1.6" fill="#fff" opacity=".75"/>' +
+    const darker = darkenHex(color, 0.5);
+    let outerPetals = '', innerPetals = '';
+    for(let i=0;i<12;i++){
+      const ang = i*30;
+      outerPetals += '<ellipse cx="20" cy="19" rx="16" ry="6.2" fill="'+color+'" stroke="'+dark+'" stroke-width="1" transform="rotate('+ang+' 20 19)"/>';
+    }
+    for(let i=0;i<10;i++){
+      const ang = i*36+15;
+      innerPetals += '<ellipse cx="20" cy="19" rx="10.5" ry="4.4" fill="'+dark+'" stroke="'+darker+'" stroke-width=".8" opacity="0.9" transform="rotate('+ang+' 20 19)"/>';
+    }
+    let gems = '';
+    for(let i=0;i<8;i++){
+      const ang = i*45*Math.PI/180;
+      const gx = 20+6.2*Math.cos(ang), gy = 19+6.2*Math.sin(ang);
+      gems += '<circle cx="'+gx.toFixed(2)+'" cy="'+gy.toFixed(2)+'" r="0.9" fill="#fff" opacity="0.85"/>';
+    }
+    return '<svg viewBox="0 0 40 44" style="width:100%;height:100%;overflow:visible;">' +
+      '<polygon points="13,25 18,25 13.5,41 9.5,39" fill="'+dark+'" stroke="'+darker+'" stroke-width=".6"/>' +
+      '<polygon points="27,25 22,25 26.5,41 30.5,39" fill="'+dark+'" stroke="'+darker+'" stroke-width=".6"/>' +
+      '<path d="M11.5,36 L13,40 L11,39.3 Z" fill="#E8B830"/>' +
+      '<path d="M28.5,36 L27,40 L29,39.3 Z" fill="#E8B830"/>' +
+      '<circle cx="12.2" cy="34" r=".9" fill="#E8B830"/>' +
+      '<circle cx="27.8" cy="34" r=".9" fill="#E8B830"/>' +
+      '<g>' + outerPetals + '</g>' +
+      '<g>' + innerPetals + '</g>' +
+      '<circle cx="20" cy="19" r="8.6" fill="url(#gold)" stroke="#8A5A12" stroke-width="1"/>' +
+      '<circle cx="20" cy="19" r="6.2" fill="none" stroke="'+dark+'" stroke-width="1"/>' +
+      gems +
+      '<circle cx="20" cy="19" r="2.6" fill="'+color+'" stroke="'+dark+'" stroke-width=".8"/>' +
+      '<ellipse cx="17" cy="15.5" rx="2.8" ry="1.7" fill="#fff" opacity=".8"/>' +
     '</svg>';
   }
 
@@ -2218,6 +2255,7 @@
             else eq.push(item.id);
             setEquipped(eq);
             renderWardrobeScreen();
+            triggerPoseAnimation();
             ensureAudio(); tone(600,0.08,'sine',0.1,0);
           });
         }
@@ -2244,6 +2282,7 @@
               const eq = getEquippedOwner(); eq.push(item.id); setEquippedOwner(eq);
               ensureAudio(); playBooster();
               renderWardrobeScreen();
+              triggerPoseAnimation();
             } else {
               ensureAudio(); tone(160,0.15,'sawtooth',0.1,0);
               card.classList.add('shake'); setTimeout(()=>card.classList.remove('shake'), 300);
@@ -2254,12 +2293,20 @@
             else eq.push(item.id);
             setEquippedOwner(eq);
             renderWardrobeScreen();
+            triggerPoseAnimation();
             ensureAudio(); tone(600,0.08,'sine',0.1,0);
           }
         });
         grid.appendChild(card);
       });
     }
+  }
+  function triggerPoseAnimation(){
+    const target = wardrobeActiveTab==='dog' ? document.getElementById('heroDogWardrobe') : document.getElementById('ownerWardrobePreview');
+    if(!target) return;
+    target.classList.remove('strike-pose');
+    void target.offsetWidth;
+    target.classList.add('strike-pose');
   }
   const NODE_COORDS = [
     {x:160, y:30}, {x:80, y:150}, {x:230, y:270}, {x:70, y:390}, {x:200, y:510}, {x:150, y:615}
