@@ -248,6 +248,15 @@
     60%{ transform:scale(1.15) rotate(6deg); opacity:1; }
     100%{ transform:scale(1) rotate(0deg); }
   }
+  .owner-arm-l{ animation: armSwayL 2.4s ease-in-out infinite; }
+  .owner-arm-r{ animation: armSwayR 2.4s ease-in-out infinite; }
+  @keyframes armSwayL{ 0%,100%{ transform:rotate(0deg);} 50%{ transform:rotate(-6deg);} }
+  @keyframes armSwayR{ 0%,100%{ transform:rotate(0deg);} 50%{ transform:rotate(6deg);} }
+  .owner-head{ animation: headBob 3.2s ease-in-out infinite; transform-origin:100px 150px; }
+  @keyframes headBob{ 0%,100%{ transform:translateY(0) rotate(0deg);} 50%{ transform:translateY(-2px) rotate(-1.5deg);} }
+  .slider-row{ display:flex; align-items:center; gap:8px; width:100%; margin:6px 0; }
+  .slider-row label{ font-size:10px; font-weight:700; color:var(--ink); width:44px; text-align:left; flex-shrink:0; }
+  .slider-row input[type=range]{ flex:1; height:20px; }
   .owner-hair{ position:absolute; top:-3px; left:13px; width:38px; height:20px; background:#8A5A3C; border:2.5px solid var(--ink); border-radius:50% 50% 15% 15%; z-index:1; }
   .owner-head{ position:absolute; top:2px; left:15px; width:32px; height:30px; background:#F2C79A; border:2.5px solid var(--ink); border-radius:50%; z-index:2; }
   .owner-eye{ position:absolute; top:14px; width:3px; height:4px; background:var(--ink); border-radius:50%; }
@@ -571,6 +580,12 @@
     </div>
     <div style="background:rgba(255,251,240,0.92); border-top:3px solid var(--ink); border-radius:22px 22px 0 0; padding:12px 14px 16px; width:100%; position:relative; z-index:1; box-shadow:0 -4px 16px rgba(0,0,0,0.15);">
       <div class="caption" id="wardrobeCaption" style="margin:0 auto 8px;">Tap an unlocked item to try it on!</div>
+      <div id="ownerSlidersPanel" class="hidden" style="width:100%; max-width:280px; margin:0 auto 8px;">
+        <div class="slider-row"><label>Skin</label><input type="range" id="sliderSkin" min="0" max="360"></div>
+        <div class="slider-row"><label>Hair</label><input type="range" id="sliderHair" min="0" max="360"></div>
+        <div class="slider-row"><label>Eyes</label><input type="range" id="sliderEyes" min="0" max="360"></div>
+        <div class="slider-row"><label>Width</label><input type="range" id="sliderWidth" min="80" max="120"></div>
+      </div>
       <div id="wardrobeGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; max-width:300px; margin:0 auto 10px;"></div>
       <button id="wardrobeBackBtn" class="action-btn" style="max-width:260px;">Back</button>
     </div>
@@ -1209,14 +1224,55 @@
       default: return '';
     }
   }
+  function getOwnerParams(){
+    try{
+      const p = JSON.parse(localStorage.getItem('ownerParams'));
+      if(p) return p;
+    }catch(e){}
+    return { skin:36, hair:24, eyes:210, outfit:350, width:1.0 };
+  }
+  function setOwnerParams(p){ localStorage.setItem('ownerParams', JSON.stringify(p)); }
+  function hsl(h, s, l){ return 'hsl(' + Math.round(h) + ',' + s + '%,' + l + '%)'; }
+  function ownerCharacterSVG(p){
+    const skin = hsl(p.skin, 45, 68);
+    const hair = hsl(p.hair, 55, 35);
+    const eyes = hsl(p.eyes, 55, 40);
+    const outfit = hsl(p.outfit, 55, 55);
+    const sx = p.width;
+    return '<svg viewBox="0 0 200 400" style="width:100%; height:100%; overflow:visible;">' +
+      '<g style="transform:scaleX(' + sx + '); transform-origin:100px 200px;">' +
+        '<rect x="70" y="262" width="25" height="98" rx="10" fill="' + outfit + '" stroke="#241812" stroke-width="4"/>' +
+        '<rect x="105" y="262" width="25" height="98" rx="10" fill="' + outfit + '" stroke="#241812" stroke-width="4"/>' +
+        '<ellipse cx="82" cy="364" rx="17" ry="8" fill="#5C3A21" stroke="#241812" stroke-width="3"/>' +
+        '<ellipse cx="118" cy="364" rx="17" ry="8" fill="#5C3A21" stroke="#241812" stroke-width="3"/>' +
+        '<rect x="58" y="160" width="84" height="112" rx="22" fill="' + outfit + '" stroke="#241812" stroke-width="4"/>' +
+        '<g class="owner-arm-l" style="transform-origin:66px 178px;"><rect x="32" y="170" width="24" height="92" rx="12" fill="' + skin + '" stroke="#241812" stroke-width="4"/></g>' +
+        '<g class="owner-arm-r" style="transform-origin:134px 178px;"><rect x="144" y="170" width="24" height="92" rx="12" fill="' + skin + '" stroke="#241812" stroke-width="4"/></g>' +
+        '<rect x="86" y="138" width="28" height="32" fill="' + skin + '" stroke="#241812" stroke-width="3"/>' +
+        '<g class="owner-head">' +
+          '<circle cx="100" cy="98" r="50" fill="' + skin + '" stroke="#241812" stroke-width="4"/>' +
+          '<path d="M48 88 Q42 26 100 20 Q158 26 152 88 Q152 56 100 50 Q48 56 48 88 Z" fill="' + hair + '" stroke="#241812" stroke-width="4" stroke-linejoin="round"/>' +
+          '<path d="M50 82 Q36 110 53 142 L64 136 Q50 110 59 86 Z" fill="' + hair + '" stroke="#241812" stroke-width="3" stroke-linejoin="round"/>' +
+          '<path d="M150 82 Q164 110 147 142 L136 136 Q150 110 141 86 Z" fill="' + hair + '" stroke="#241812" stroke-width="3" stroke-linejoin="round"/>' +
+          '<ellipse cx="80" cy="100" rx="7.5" ry="9.5" fill="' + eyes + '" stroke="#241812" stroke-width="2.5"/>' +
+          '<ellipse cx="120" cy="100" rx="7.5" ry="9.5" fill="' + eyes + '" stroke="#241812" stroke-width="2.5"/>' +
+          '<circle cx="78" cy="97" r="2.2" fill="#fff"/>' +
+          '<circle cx="118" cy="97" r="2.2" fill="#fff"/>' +
+          '<ellipse cx="68" cy="118" rx="8" ry="5" fill="#FF9EAE" opacity="0.5"/>' +
+          '<ellipse cx="132" cy="118" rx="8" ry="5" fill="#FF9EAE" opacity="0.5"/>' +
+          '<path d="M84 122 Q100 133 116 122" stroke="#241812" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+        '</g>' +
+      '</g>' +
+    '</svg>';
+  }
   function ownerFigureInnerHTML(overlayId){
-    return '<img src="https://raw.githubusercontent.com/clomoney13/woof/main/assets/owner-hero.png" style="width:100%; height:100%; object-fit:contain; display:block;">' +
-      '<div id="'+overlayId+'" style="position:absolute; inset:0;"></div>';
+    return '<div id="' + overlayId + '" style="position:absolute; inset:0;"></div>';
   }
   function renderOwnerOnFigure(targetId, overlayId){
     const fig = document.getElementById(targetId);
     if(!fig) return;
-    fig.innerHTML = ownerFigureInnerHTML(overlayId);
+    fig.style.position = 'relative';
+    fig.innerHTML = '<div class="owner-svg-wrap" style="width:100%; height:100%;">' + ownerCharacterSVG(getOwnerParams()) + '</div>' + ownerFigureInnerHTML(overlayId);
     const overlay = document.getElementById(overlayId);
     getEquippedOwner().forEach(id => { overlay.innerHTML += ownerItemOverlayHTML(id); });
   }
@@ -2251,14 +2307,33 @@
   });
   document.getElementById('wardrobeBackBtn').addEventListener('click', showMap);
   document.getElementById('wardrobeTabDog').addEventListener('click', () => { wardrobeActiveTab='dog'; renderWardrobeScreen(); });
+  ['sliderSkin','sliderHair','sliderEyes','sliderWidth'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      const p = getOwnerParams();
+      p.skin = +document.getElementById('sliderSkin').value;
+      p.hair = +document.getElementById('sliderHair').value;
+      p.eyes = +document.getElementById('sliderEyes').value;
+      p.width = +document.getElementById('sliderWidth').value / 100;
+      setOwnerParams(p);
+      renderOwnerOnFigure('ownerWardrobePreview', 'ownerOverlayWardrobe');
+    });
+  });
   document.getElementById('wardrobeTabOwner').addEventListener('click', () => { wardrobeActiveTab='owner'; renderWardrobeScreen(); });
   function renderWardrobeScreen(){
     document.getElementById('wardrobeTabDog').classList.toggle('active', wardrobeActiveTab==='dog');
     document.getElementById('wardrobeTabOwner').classList.toggle('active', wardrobeActiveTab==='owner');
     document.getElementById('heroDogWardrobe').classList.toggle('hidden', wardrobeActiveTab!=='dog');
     document.getElementById('ownerWardrobePreview').classList.toggle('hidden', wardrobeActiveTab!=='owner');
+    document.getElementById('ownerSlidersPanel').classList.toggle('hidden', wardrobeActiveTab!=='owner');
     if(wardrobeActiveTab==='dog'){ renderHeroDog('heroDogWardrobe', getEquipped()); }
-    else { renderOwnerOnFigure('ownerWardrobePreview', 'ownerOverlayWardrobe'); }
+    else {
+      renderOwnerOnFigure('ownerWardrobePreview', 'ownerOverlayWardrobe');
+      const p = getOwnerParams();
+      document.getElementById('sliderSkin').value = p.skin;
+      document.getElementById('sliderHair').value = p.hair;
+      document.getElementById('sliderEyes').value = p.eyes;
+      document.getElementById('sliderWidth').value = Math.round(p.width*100);
+    }
     const grid = document.getElementById('wardrobeGrid');
     grid.innerHTML = '';
     if(wardrobeActiveTab==='dog'){
@@ -2292,7 +2367,7 @@
         grid.appendChild(card);
       });
     } else {
-      document.getElementById('wardrobeCaption').textContent = 'Buy outfits with coins, then tap to wear them!';
+      document.getElementById('wardrobeCaption').textContent = 'Drag the sliders to customize! Buy outfits with coins below.';
       const owned = getOwnedOwnerItems();
       const equippedOwner = getEquippedOwner();
       OWNER_ITEMS.forEach(item => {
