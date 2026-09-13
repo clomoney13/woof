@@ -259,6 +259,15 @@
   .tab-bar{ display:flex; width:100%; max-width:300px; margin-top:auto; padding-top:10px; border-top:2px solid var(--ink); }
   .tab-btn{ flex:1; text-align:center; padding:8px 4px 4px; font-weight:700; font-size:12px; color:var(--text-dim); cursor:pointer; }
   .tab-btn.active{ color:var(--ink); border-bottom:3px solid var(--red); }
+
+  .stage-curtain{ position:absolute; top:0; width:70px; height:110px; z-index:0; pointer-events:none; }
+  .stage-curtain.l{ left:0; background:repeating-linear-gradient(90deg, #B0463F 0 10px, #8E332C 10px 20px); border-radius:0 0 40px 0; box-shadow:4px 0 12px rgba(0,0,0,0.15); }
+  .stage-curtain.r{ right:0; background:repeating-linear-gradient(90deg, #B0463F 0 10px, #8E332C 10px 20px); border-radius:0 0 0 40px; box-shadow:-4px 0 12px rgba(0,0,0,0.15); }
+  .stage-spotlight{ position:absolute; top:20px; left:50%; transform:translateX(-50%); width:340px; height:280px;
+    background:radial-gradient(ellipse at center, rgba(255,244,200,0.55) 0%, rgba(255,244,200,0) 70%); z-index:0; pointer-events:none; }
+  .stage-floor{ width:100%; max-width:280px; height:16px; margin:-6px auto 0;
+    background:linear-gradient(180deg, #C9975C, #A87A44); border:2.5px solid var(--ink); border-radius:50%; position:relative; z-index:0;
+    box-shadow:0 4px 0 rgba(59,42,32,0.2); }
   .leash-cell-tap{ position:absolute; cursor:pointer; z-index:6; }
   .treat-prop{ position:absolute; width:22px; height:22px; z-index:1; animation: treatBounce 1s ease-in-out infinite; pointer-events:none;
     filter: drop-shadow(0 0 5px rgba(255,212,71,0.7)); }
@@ -518,28 +527,33 @@
   <div class="balloon" id="balloon1" style="top:70px; width:38px; height:46px; background:var(--red); animation-duration:26s;"><div class="string"></div><div class="basket"></div></div>
   <div class="balloon" id="balloon2" style="top:160px; width:30px; height:37px; background:var(--purple); animation-duration:34s; animation-delay:-14s;"><div class="string"></div><div class="basket"></div></div>
 
-  <div id="homeScreen" class="screen" style="align-items:center; text-align:center;">
+  <div id="homeScreen" class="screen" style="align-items:center; text-align:center; position:relative; overflow:hidden;">
+    <div class="stage-curtain l"></div>
+    <div class="stage-curtain r"></div>
+    <div class="stage-spotlight"></div>
     <div class="string-lights" id="stringLightsHome"></div>
-    <div class="map-title">Best in Show</div>
-    <div class="stat-row-home">
+    <div class="map-title" style="position:relative; z-index:1;">Best in Show</div>
+    <div class="stat-row-home" style="position:relative; z-index:1;">
       <div class="stat-chip">Best Streak<b id="homeBestStreak">0</b></div>
       <div class="stat-chip">Coins<b id="homeCoins">0</b></div>
     </div>
-    <div class="speech-bubble" id="homeSpeech">Let's go, pup!</div>
-    <div class="duo-stage">
+    <div class="speech-bubble" id="homeSpeech" style="position:relative; z-index:1;">Let's go, pup!</div>
+    <div class="duo-stage" style="position:relative; z-index:1;">
       <div class="owner-figure" id="ownerHome"></div>
       <div style="position:relative; width:100px; height:92px;">
         <div class="mascot" id="mascotHome"></div>
         <div id="wardrobeOverlay"></div>
       </div>
     </div>
-    <div style="display:flex; flex-direction:column; gap:9px; width:100%; max-width:260px; margin-top:8px;">
+    <div class="stage-floor"></div>
+    <div style="display:flex; flex-direction:column; gap:9px; width:100%; max-width:260px; margin-top:8px; position:relative; z-index:1;">
       <button id="enterCompBtn" class="primary-btn">Play!</button>
       <button id="enterPageantBtn" class="action-btn" style="background:linear-gradient(160deg, rgba(255,255,255,.5), rgba(255,255,255,0) 50%), var(--gold);">Enter the Pageant</button>
       <button id="wardrobeBtn" class="action-btn">Dress Up</button>
     </div>
-    <div class="tab-bar">
+    <div class="tab-bar" style="position:relative; z-index:1;">
       <div class="tab-btn active" data-tab="home">Home</div>
+      <div class="tab-btn" data-tab="cards">Cards</div>
       <div class="tab-btn" data-tab="trophies">Trophies</div>
     </div>
   </div>
@@ -560,12 +574,24 @@
     <button id="wardrobeBackBtn" class="action-btn" style="max-width:260px;">Back</button>
   </div>
 
+  <div id="cardsScreen" class="screen hidden" style="align-items:center; text-align:center;">
+    <div class="map-title" style="font-size:22px;">Card Collection</div>
+    <div class="caption" id="cardsCaption">Win puzzles for a chance at a card!</div>
+    <div id="cardsGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; width:100%; max-width:300px; margin:14px 0; overflow-y:auto;"></div>
+    <div class="tab-bar">
+      <div class="tab-btn" data-tab="home">Home</div>
+      <div class="tab-btn active" data-tab="cards">Cards</div>
+      <div class="tab-btn" data-tab="trophies">Trophies</div>
+    </div>
+  </div>
+
   <div id="trophiesScreen" class="screen hidden" style="align-items:center; text-align:center;">
     <div class="map-title" style="font-size:22px;">Trophies</div>
     <div class="caption">Win Pageants to fill your trophy case!</div>
     <div id="trophyGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; max-width:300px; margin:14px 0;"></div>
     <div class="tab-bar">
       <div class="tab-btn" data-tab="home">Home</div>
+      <div class="tab-btn" data-tab="cards">Cards</div>
       <div class="tab-btn active" data-tab="trophies">Trophies</div>
     </div>
   </div>
@@ -1097,9 +1123,9 @@
   function addCoins(n){ localStorage.setItem('coins', String(getCoins()+n)); }
   function spendCoins(n){ const c=getCoins(); if(c<n) return false; localStorage.setItem('coins', String(c-n)); return true; }
   const OWNER_ITEMS = [
-    { id:'sunhat', name:'Sun Hat', cost:20 },
-    { id:'bow', name:'Neck Bow', cost:15 },
-    { id:'sparkledress', name:'Sparkle Dress', cost:40 }
+    { id:'bow', name:'Neck Bow', cost:25 },
+    { id:'sunhat', name:'Sun Hat', cost:35 },
+    { id:'sparkledress', name:'Sparkle Dress', cost:90 }
   ];
   function getOwnedOwnerItems(){ try{ return JSON.parse(localStorage.getItem('ownedOwnerItems')||'[]'); }catch(e){ return []; } }
   function setOwnedOwnerItems(arr){ localStorage.setItem('ownedOwnerItems', JSON.stringify(arr)); }
@@ -1124,6 +1150,52 @@
     fig.innerHTML = ownerFigureInnerHTML(overlayId);
     const overlay = document.getElementById(overlayId);
     getEquippedOwner().forEach(id => { overlay.innerHTML += ownerItemOverlayHTML(id); });
+  }
+
+  // ---- Collector Cards (breed field left in place for future non-sausage breeds) ----
+  const CARD_SET = [
+    { id:'classic-tan', name:'Classic Tan', breed:'dachshund', rarity:'common', color:'#D9A876' },
+    { id:'black-tan', name:'Black & Tan', breed:'dachshund', rarity:'common', color:'#4A3428' },
+    { id:'red', name:'Red Sausage', breed:'dachshund', rarity:'common', color:'#C0392B' },
+    { id:'snow', name:'Snow Pup', breed:'dachshund', rarity:'common', color:'#F2ECE0' },
+    { id:'cream', name:'Cream Puff', breed:'dachshund', rarity:'rare', color:'#F2E4C9' },
+    { id:'chocolate', name:'Chocolate Drop', breed:'dachshund', rarity:'rare', color:'#5C3A21' },
+    { id:'merle', name:'Blue Merle', breed:'dachshund', rarity:'rare', color:'#7B93A8' },
+    { id:'golden', name:'Golden Sausage', breed:'dachshund', rarity:'epic', color:'#E8B830' },
+    { id:'bubblegum', name:'Bubblegum Pup', breed:'dachshund', rarity:'epic', color:'#FF7BAC' },
+    { id:'galaxy', name:'Galaxy Sausage', breed:'dachshund', rarity:'legendary', color:'#7B4FE0' }
+  ];
+  const RARITY_WEIGHTS = { common:60, rare:25, epic:12, legendary:3 };
+  const RARITY_DUPE_COINS = { common:3, rare:8, epic:20, legendary:50 };
+  const RARITY_COLORS = { common:'#B8AD9C', rare:'#8FAFC7', epic:'#E8B830', legendary:'#B47BE0' };
+  function getOwnedCards(){ try{ return JSON.parse(localStorage.getItem('ownedCards')||'[]'); }catch(e){ return []; } }
+  function setOwnedCards(arr){ localStorage.setItem('ownedCards', JSON.stringify(arr)); }
+  function rollCardRarity(){
+    const total = Object.values(RARITY_WEIGHTS).reduce((a,b)=>a+b,0);
+    let r = Math.random()*total;
+    for(const [rarity,weight] of Object.entries(RARITY_WEIGHTS)){
+      if(r < weight) return rarity;
+      r -= weight;
+    }
+    return 'common';
+  }
+  function maybeAwardCard(){
+    if(Math.random() > 0.25) return null;
+    const rarity = rollCardRarity();
+    const pool = CARD_SET.filter(c => c.rarity === rarity);
+    const card = pool[Math.floor(Math.random()*pool.length)];
+    const owned = getOwnedCards();
+    if(owned.includes(card.id)){
+      const coins = RARITY_DUPE_COINS[rarity];
+      addCoins(coins);
+      return { card, duplicate:true, coins };
+    }
+    owned.push(card.id);
+    setOwnedCards(owned);
+    return { card, duplicate:false };
+  }
+  function cardArtHTML(color){
+    return '<svg viewBox="'+DOG_BODY_PATHS.medium.vb+'" style="width:100%;height:100%;">' + dogSVGMarkup('medium', color) + '</svg>';
   }
 
   let state = { levelIndex:0, blocks:[], doors:[], initial:[], moves:0, history:[], highestUnlocked:0, score:0, combo:0, boosters:{paws:false,treat:false,double:false}, equippedBoosters:{paws:true,treat:true,double:true}, doubleActive:false, bossCompleted:false, isBoss:false, isEndless:false, endlessStreak:0, unlockedSnapshot:[], bossTimeLeft:60, bossTimerInterval:null };
@@ -1765,11 +1837,18 @@
     stopBossTimer();
     if(state.isEndless){
       state.endlessStreak++;
-      addCoins(8);
+      const earned = 5 + state.endlessStreak;
+      addCoins(earned);
+      const cardResult = maybeAwardCard();
       const prevBest = parseInt(localStorage.getItem('endlessBest')||'0',10);
       const isNewBest = state.endlessStreak > prevBest;
-      if(isNewBest) localStorage.setItem('endlessBest', String(state.endlessStreak));
-      document.getElementById('winStats').textContent = 'Streak: ' + state.endlessStreak + ' — cleared in ' + state.moves + ' moves — +8 coins!' + (isNewBest ? ' NEW BEST!' : ' (best: ' + Math.max(prevBest, state.endlessStreak) + ')');
+      if(isNewBest){ localStorage.setItem('endlessBest', String(state.endlessStreak)); state.runHitNewBest = true; }
+      let statsText = 'Streak: ' + state.endlessStreak + ' — cleared in ' + state.moves + ' moves — +' + earned + ' coins!';
+      if(cardResult){
+        statsText += cardResult.duplicate ? (' Duplicate card (+' + cardResult.coins + ' coins)!') : (' New card: ' + cardResult.card.name + '!');
+      }
+      statsText += isNewBest ? ' NEW BEST!' : (' (best: ' + Math.max(prevBest, state.endlessStreak) + ')');
+      document.getElementById('winStats').textContent = statsText;
       document.getElementById('nextBtn').textContent = 'Next Puzzle →';
       if(isNewBest) bark('New record!', 1.5, 1.1);
     } else if(state.isBoss){
@@ -1809,6 +1888,10 @@
       document.getElementById('failTitle').textContent = 'Streak Over!';
       document.getElementById('failTitle').style.color = '#B0463F';
       let msgText = 'You reached a streak of ' + state.endlessStreak + '! Best ever: ' + best + '. Ready to beat it?';
+      if(state.runHitNewBest){
+        addCoins(20);
+        msgText += ' +20 bonus coins for a new personal best!';
+      }
       const nowUnlocked = WARDROBE_ITEMS.filter(isItemUnlocked).map(i=>i.id);
       const newlyUnlocked = nowUnlocked.filter(id => !state.unlockedSnapshot.includes(id));
       if(newlyUnlocked.length){
@@ -1863,6 +1946,7 @@
     state.isBoss = false;
     state.isEndless = true;
     state.endlessStreak = 0;
+    state.runHitNewBest = false;
     state.unlockedSnapshot = WARDROBE_ITEMS.filter(isItemUnlocked).map(i=>i.id);
     localStorage.setItem('totalCompetitions', String(getTotalPlayed()+1));
     document.getElementById('homeScreen').classList.add('hidden');
@@ -2001,10 +2085,7 @@
   })();
 
   function showMap(){
-    document.getElementById('gameScreen').classList.add('hidden');
-    document.getElementById('wardrobeScreen').classList.add('hidden');
-    document.getElementById('trophiesScreen').classList.add('hidden');
-    document.getElementById('pageantScreen').classList.add('hidden');
+    hideAllHubScreens();
     document.getElementById('homeScreen').classList.remove('hidden');
     setMascotMessage();
     document.getElementById('homeBestStreak').textContent = getBestStreak();
@@ -2020,13 +2101,19 @@
     btn.addEventListener('click', () => {
       if(btn.dataset.tab==='home') showMap();
       else if(btn.dataset.tab==='trophies') showTrophies();
+      else if(btn.dataset.tab==='cards') showCards();
     });
   });
-  function showTrophies(){
+  function hideAllHubScreens(){
     document.getElementById('homeScreen').classList.add('hidden');
     document.getElementById('gameScreen').classList.add('hidden');
     document.getElementById('wardrobeScreen').classList.add('hidden');
     document.getElementById('pageantScreen').classList.add('hidden');
+    document.getElementById('trophiesScreen').classList.add('hidden');
+    document.getElementById('cardsScreen').classList.add('hidden');
+  }
+  function showTrophies(){
+    hideAllHubScreens();
     document.getElementById('trophiesScreen').classList.remove('hidden');
     setActiveTab('trophies');
     const grid = document.getElementById('trophyGrid');
@@ -2037,6 +2124,31 @@
       slot.innerHTML = '<div style="font-size:22px; font-weight:800; color:#8A7A6C;">?</div><div style="font-size:9px; color:#8A7A6C; margin-top:4px;">Locked</div>';
       grid.appendChild(slot);
     }
+  }
+  function showCards(){
+    hideAllHubScreens();
+    document.getElementById('cardsScreen').classList.remove('hidden');
+    setActiveTab('cards');
+    const owned = getOwnedCards();
+    document.getElementById('cardsCaption').textContent = owned.length + ' / ' + CARD_SET.length + ' collected — win puzzles for a chance at more!';
+    const grid = document.getElementById('cardsGrid');
+    grid.innerHTML = '';
+    CARD_SET.forEach(c => {
+      const has = owned.includes(c.id);
+      const frameColor = RARITY_COLORS[c.rarity];
+      const cell = document.createElement('div');
+      cell.style.cssText = 'background:#FFFBF0; border:3px solid '+(has?frameColor:'#B8AD9C')+'; border-radius:12px; padding:6px 4px; text-align:center;' + (has && c.rarity!=='common' ? ' box-shadow:0 0 8px 1px '+frameColor+';' : '');
+      if(has){
+        cell.innerHTML = '<div style="width:100%; height:44px;">'+cardArtHTML(c.color)+'</div>' +
+          '<div style="font-size:9px; font-weight:700; color:#3B2A20; margin-top:2px;">'+c.name+'</div>' +
+          '<div style="font-size:8px; font-weight:800; color:'+frameColor+'; text-transform:uppercase;">'+c.rarity+'</div>';
+      } else {
+        cell.style.opacity = '.55';
+        cell.innerHTML = '<div style="width:100%; height:44px; display:flex; align-items:center; justify-content:center; font-size:20px; color:#8A7A6C; font-weight:800;">?</div>' +
+          '<div style="font-size:9px; color:#8A7A6C; margin-top:2px;">Undiscovered</div>';
+      }
+      grid.appendChild(cell);
+    });
   }
   document.getElementById('enterCompBtn').addEventListener('click', startEndless);
   document.getElementById('enterPageantBtn').addEventListener('click', () => {
