@@ -540,10 +540,7 @@
     <div class="speech-bubble" id="homeSpeech" style="position:relative; z-index:1;">Let's go, pup!</div>
     <div class="duo-stage" style="position:relative; z-index:1;">
       <div class="owner-figure" id="ownerHome"></div>
-      <div style="position:relative; width:100px; height:92px;">
-        <div class="mascot" id="mascotHome"></div>
-        <div id="wardrobeOverlay"></div>
-      </div>
+      <div id="heroDogHome" style="width:130px; height:112px;"></div>
     </div>
     <div class="stage-floor"></div>
     <div style="display:flex; flex-direction:column; gap:9px; width:100%; max-width:260px; margin-top:8px; position:relative; z-index:1;">
@@ -564,9 +561,8 @@
       <div class="tab-btn active" id="wardrobeTabDog">Dog</div>
       <div class="tab-btn" id="wardrobeTabOwner">Owner</div>
     </div>
-    <div style="position:relative; width:100px; height:110px; margin:10px auto;">
-      <div class="mascot" id="mascotWardrobe"></div>
-      <div id="wardrobePreviewOverlay"></div>
+    <div style="position:relative; width:130px; height:112px; margin:10px auto;">
+      <div id="heroDogWardrobe" style="width:100%; height:100%;"></div>
       <div class="owner-figure hidden" id="ownerWardrobePreview" style="position:absolute; top:0; left:0;"></div>
     </div>
     <div class="caption" id="wardrobeCaption">Tap an unlocked item to try it on!</div>
@@ -803,6 +799,31 @@
     const len = b.orient==='h' ? b.w : b.h;
     return len===1 ? 'short' : len===3 ? 'long' : 'medium';
   }
+  // ---- Hero dog: same art as the real sliding pieces, used for portrait/profile display ----
+  const HERO_DOG_COLOR = '#D9A876';
+  const HERO_DOG_VB = '-15 -30 345 190';
+  function dogAccessorySVG(id){
+    switch(id){
+      case 'bandana': return '<path d="M140 90 L192 90 L166 122 Z" fill="#E8425F" stroke="#241812" stroke-width="5" stroke-linejoin="round"/>';
+      case 'cap': return '<path d="M148 14 Q225 -20 300 16 L300 32 Q225 8 148 30 Z" fill="#4FB8E8" stroke="#241812" stroke-width="5" stroke-linejoin="round"/>';
+      case 'shades': return '<rect x="286" y="54" width="32" height="18" rx="5" fill="#221833" stroke="#241812" stroke-width="4"/>';
+      case 'bowtie': return '<path d="M150 96 L172 90 L172 106 Z" fill="#B47BE0" stroke="#241812" stroke-width="4" stroke-linejoin="round"/><path d="M194 96 L172 90 L172 106 Z" fill="#B47BE0" stroke="#241812" stroke-width="4" stroke-linejoin="round"/><circle cx="172" cy="98" r="6" fill="#8A5A12" stroke="#241812" stroke-width="3"/>';
+      case 'crown': return '<path d="M158 16 L170 -8 L188 10 L206 -14 L224 10 L242 -8 L254 16 Z" fill="#E8B830" stroke="#241812" stroke-width="5" stroke-linejoin="round"/>';
+      case 'cape': return '<path d="M38 28 Q8 88 38 128 L218 128 Q248 88 218 28 Z" fill="#E8304F" stroke="#241812" stroke-width="5" stroke-linejoin="round" opacity="0.92"/>';
+      default: return '';
+    }
+  }
+  function heroDogSVG(color, equippedList){
+    const capeHTML = equippedList.includes('cape') ? dogAccessorySVG('cape') : '';
+    const dogLayer = dogSVGMarkup('medium', color);
+    const frontAccessories = equippedList.filter(id => id!=='cape').map(dogAccessorySVG).join('');
+    return capeHTML + dogLayer + frontAccessories;
+  }
+  function renderHeroDog(targetId, equippedList){
+    const el = document.getElementById(targetId);
+    if(!el) return;
+    el.innerHTML = '<svg viewBox="'+HERO_DOG_VB+'" style="width:100%;height:100%;">' + heroDogSVG(HERO_DOG_COLOR, equippedList) + '</svg>';
+  }
 
   const CONFETTI_PALETTE = ['#FF5A5F','#FFD447','#4FB8E8','#7BC96F','#FF7BAC','#B47BE0','#FFA542'];
 
@@ -826,7 +847,7 @@
       '<div class="mascot-eye l"></div><div class="mascot-eye r"></div>' +
       '<div class="mascot-nose"></div><div class="mascot-tongue"></div>';
   }
-  ['mascotDog','mascotWin','mascotLoadout','mascotHome','mascotWardrobe'].forEach(id => {
+  ['mascotDog','mascotWin','mascotLoadout'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.innerHTML = dogHTML();
   });
@@ -2090,7 +2111,7 @@
     setMascotMessage();
     document.getElementById('homeBestStreak').textContent = getBestStreak();
     document.getElementById('homeCoins').textContent = getCoins();
-    renderWardrobeOnDog('wardrobeOverlay');
+    renderHeroDog('heroDogHome', getEquipped());
     renderOwnerOnFigure('ownerHome', 'ownerOverlayHome');
     setActiveTab('home');
   }
@@ -2169,10 +2190,9 @@
   function renderWardrobeScreen(){
     document.getElementById('wardrobeTabDog').classList.toggle('active', wardrobeActiveTab==='dog');
     document.getElementById('wardrobeTabOwner').classList.toggle('active', wardrobeActiveTab==='owner');
-    document.getElementById('mascotWardrobe').classList.toggle('hidden', wardrobeActiveTab!=='dog');
-    document.getElementById('wardrobePreviewOverlay').classList.toggle('hidden', wardrobeActiveTab!=='dog');
+    document.getElementById('heroDogWardrobe').classList.toggle('hidden', wardrobeActiveTab!=='dog');
     document.getElementById('ownerWardrobePreview').classList.toggle('hidden', wardrobeActiveTab!=='owner');
-    if(wardrobeActiveTab==='dog'){ renderWardrobeOnDog('wardrobePreviewOverlay'); }
+    if(wardrobeActiveTab==='dog'){ renderHeroDog('heroDogWardrobe', getEquipped()); }
     else { renderOwnerOnFigure('ownerWardrobePreview', 'ownerOverlayWardrobe'); }
     const grid = document.getElementById('wardrobeGrid');
     grid.innerHTML = '';
