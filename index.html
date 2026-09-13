@@ -242,12 +242,10 @@
 
   .duo-stage{ display:flex; align-items:flex-end; justify-content:center; gap:18px; margin:8px 0 4px; min-height:112px; }
   .owner-figure{ position:relative; width:66px; height:108px; flex-shrink:0; }
-  .strike-pose{ animation: strikePose 0.6s cubic-bezier(.34,1.56,.64,1); }
-  @keyframes strikePose{
-    0%{ transform:scale(1) rotate(0deg); }
-    30%{ transform:scale(1.08) rotate(-4deg); }
-    55%{ transform:scale(1.05) rotate(3deg); }
-    75%{ transform:scale(1.08) rotate(-2deg); }
+  .accessory-pop{ animation: accessoryPop 0.55s cubic-bezier(.34,1.56,.64,1); transform-origin:center; }
+  @keyframes accessoryPop{
+    0%{ transform:scale(0) rotate(-25deg); opacity:0; }
+    60%{ transform:scale(1.15) rotate(6deg); opacity:1; }
     100%{ transform:scale(1) rotate(0deg); }
   }
   .owner-hair{ position:absolute; top:-3px; left:13px; width:38px; height:20px; background:#8A5A3C; border:2.5px solid var(--ink); border-radius:50% 50% 15% 15%; z-index:1; }
@@ -811,12 +809,36 @@
   const DOG_HERO_URL = 'https://raw.githubusercontent.com/clomoney13/woof/main/assets/dog-hero.png';
   function dogAccessoryHTML(id){
     switch(id){
-      case 'cap': return '<div style="position:absolute; top:0%; left:2.8%; width:23.9%; height:15%; background:#4FB8E8; border:2.5px solid #3B2A20; border-radius:50% 50% 20% 20%; z-index:3;"></div>';
-      case 'crown': return '<div style="position:absolute; top:-6%; left:3%; width:22%; height:19%; background:#E8B830; border:2.5px solid #3B2A20; clip-path:polygon(0 100%,0 30%,20% 60%,50% 0%,80% 60%,100% 30%,100% 100%); z-index:3;"></div>';
-      case 'shades': return '<div style="position:absolute; top:18.1%; left:11%; width:9.9%; height:8.75%; background:#221833; border:2px solid #3B2A20; border-radius:4px; z-index:3;"></div>';
-      case 'bandana': return '<div style="position:absolute; top:35.9%; left:21.8%; width:8.5%; height:15.6%; background:#E8425F; border:2.5px solid #3B2A20; clip-path:polygon(0 0,100% 0,50% 100%); z-index:3;"></div>';
-      case 'bowtie': return '<div style="position:absolute; top:37%; left:22%; width:9%; height:9%; z-index:3; display:flex; align-items:center; justify-content:center;"><div style="width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:9px solid #B47BE0;"></div><div style="width:6px;height:6px;background:#8A5A12;border-radius:50%;"></div><div style="width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:9px solid #B47BE0;"></div></div>';
-      case 'cape': return '<div style="position:absolute; top:40.6%; left:26.8%; width:60.6%; height:40.6%; background:#E8304F; border:2.5px solid #3B2A20; border-radius:0 0 30px 30px; opacity:0.9; z-index:0;"></div>';
+      case 'cap': return '<svg class="accessory-pop" viewBox="0 0 100 50" style="position:absolute; top:0%; left:2.8%; width:23.9%; height:15%; z-index:3; overflow:visible;">' +
+        '<path d="M10 42 Q8 5 55 4 Q96 6 93 34 Z" fill="#4FB8E8" stroke="#241812" stroke-width="4" stroke-linejoin="round"/>' +
+        '<ellipse cx="22" cy="40" rx="24" ry="7" fill="#3B8FC7" stroke="#241812" stroke-width="3"/>' +
+        '<circle cx="55" cy="8" r="3.5" fill="#3B8FC7" stroke="#241812" stroke-width="1.5"/>' +
+        '<path d="M40 10 Q55 6 70 12" stroke="#fff" stroke-width="2.5" fill="none" opacity="0.5"/></svg>';
+      case 'crown': return '<svg class="accessory-pop" viewBox="0 0 100 50" style="position:absolute; top:-6%; left:3%; width:22%; height:19%; z-index:3; overflow:visible;">' +
+        '<path d="M6 46 L14 8 L30 28 L50 4 L70 28 L86 8 L94 46 Z" fill="#E8B830" stroke="#241812" stroke-width="4" stroke-linejoin="round"/>' +
+        '<rect x="6" y="42" width="88" height="8" fill="#E8B830" stroke="#241812" stroke-width="3"/>' +
+        '<circle cx="14" cy="16" r="4.5" fill="#FF5A5F" stroke="#241812" stroke-width="1.5"/>' +
+        '<circle cx="50" cy="13" r="5.5" fill="#4FB8E8" stroke="#241812" stroke-width="1.5"/>' +
+        '<circle cx="86" cy="16" r="4.5" fill="#B47BE0" stroke="#241812" stroke-width="1.5"/></svg>';
+      case 'shades': return '<svg class="accessory-pop" viewBox="0 0 100 50" style="position:absolute; top:18.1%; left:11%; width:9.9%; height:8.75%; z-index:3; overflow:visible;">' +
+        '<rect x="2" y="8" width="42" height="32" rx="9" fill="#221833" stroke="#241812" stroke-width="4"/>' +
+        '<rect x="56" y="8" width="42" height="32" rx="9" fill="#221833" stroke="#241812" stroke-width="4"/>' +
+        '<rect x="44" y="20" width="12" height="6" fill="#241812"/>' +
+        '<path d="M8 16 Q16 12 26 14" stroke="#fff" stroke-width="3" fill="none" opacity="0.55"/>' +
+        '<path d="M62 16 Q70 12 80 14" stroke="#fff" stroke-width="3" fill="none" opacity="0.55"/></svg>';
+      case 'bandana': return '<svg class="accessory-pop" viewBox="0 0 100 100" style="position:absolute; top:35.9%; left:21.8%; width:8.5%; height:15.6%; z-index:3; overflow:visible;">' +
+        '<path d="M5 5 L95 5 L50 92 Z" fill="#E8425F" stroke="#241812" stroke-width="5" stroke-linejoin="round"/>' +
+        '<circle cx="32" cy="26" r="4" fill="#fff" opacity="0.85"/>' +
+        '<circle cx="62" cy="34" r="4" fill="#fff" opacity="0.85"/>' +
+        '<circle cx="46" cy="56" r="4" fill="#fff" opacity="0.85"/></svg>';
+      case 'bowtie': return '<svg class="accessory-pop" viewBox="0 0 100 60" style="position:absolute; top:37%; left:22%; width:9%; height:9%; z-index:3; overflow:visible;">' +
+        '<path d="M4 8 L46 24 L46 36 L4 52 Z" fill="#B47BE0" stroke="#241812" stroke-width="4" stroke-linejoin="round"/>' +
+        '<path d="M96 8 L54 24 L54 36 L96 52 Z" fill="#B47BE0" stroke="#241812" stroke-width="4" stroke-linejoin="round"/>' +
+        '<circle cx="50" cy="30" r="11" fill="#8A5A12" stroke="#241812" stroke-width="3"/></svg>';
+      case 'cape': return '<svg class="accessory-pop" viewBox="0 0 100 100" style="position:absolute; top:40.6%; left:26.8%; width:60.6%; height:40.6%; z-index:0; overflow:visible;">' +
+        '<path d="M18 4 Q50 -6 82 4 L97 88 Q50 106 3 88 Z" fill="#E8304F" stroke="#241812" stroke-width="4" stroke-linejoin="round" opacity="0.92"/>' +
+        '<path d="M32 4 Q50 15 68 4" stroke="#241812" stroke-width="3" fill="none"/>' +
+        '<circle cx="50" cy="7" r="4.5" fill="#E8B830" stroke="#241812" stroke-width="2"/></svg>';
       default: return '';
     }
   }
@@ -1172,9 +1194,18 @@
   function setEquippedOwner(arr){ localStorage.setItem('equippedOwner', JSON.stringify(arr)); }
   function ownerItemOverlayHTML(id){
     switch(id){
-      case 'sunhat': return '<div style="position:absolute; top:-3.6%; left:7.7%; width:76.5%; height:9.6%; background:#FFD447; border:2.5px solid #3B2A20; border-radius:50%; z-index:3;"></div>';
-      case 'bow': return '<div style="position:absolute; top:30.8%; left:35.7%; width:25.5%; height:4.8%; z-index:3; display:flex; align-items:center; justify-content:center;"><div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-right:11px solid #FF5A5F;"></div><div style="width:8px;height:8px;background:#8A5A12;border-radius:50%;margin:0 -1px;"></div><div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:11px solid #FF5A5F;"></div></div>';
-      case 'sparkledress': return '<div style="position:absolute; top:32%; left:22%; font-size:18px; z-index:3;">✦</div><div style="position:absolute; top:42%; left:62%; font-size:14px; z-index:3;">✦</div><div style="position:absolute; top:52%; left:30%; font-size:16px; z-index:3;">✦</div>';
+      case 'sunhat': return '<svg class="accessory-pop" viewBox="0 0 100 45" style="position:absolute; top:-3.6%; left:7.7%; width:76.5%; height:9.6%; z-index:3; overflow:visible;">' +
+        '<ellipse cx="50" cy="34" rx="48" ry="10" fill="#FFD447" stroke="#241812" stroke-width="4"/>' +
+        '<path d="M28 30 Q28 5 50 5 Q72 5 72 30 Z" fill="#FFD447" stroke="#241812" stroke-width="4" stroke-linejoin="round"/>' +
+        '<rect x="28" y="24" width="44" height="7" fill="#E8425F" stroke="#241812" stroke-width="2"/></svg>';
+      case 'bow': return '<svg class="accessory-pop" viewBox="0 0 100 60" style="position:absolute; top:30.8%; left:35.7%; width:25.5%; height:4.8%; z-index:3; overflow:visible;">' +
+        '<path d="M4 8 L46 24 L46 36 L4 52 Z" fill="#FF5A5F" stroke="#241812" stroke-width="4" stroke-linejoin="round"/>' +
+        '<path d="M96 8 L54 24 L54 36 L96 52 Z" fill="#FF5A5F" stroke="#241812" stroke-width="4" stroke-linejoin="round"/>' +
+        '<circle cx="50" cy="30" r="10" fill="#8A5A12" stroke="#241812" stroke-width="3"/></svg>';
+      case 'sparkledress': return '<svg class="accessory-pop" viewBox="0 0 100 220" style="position:absolute; top:30%; left:15%; width:70%; height:55%; z-index:3; overflow:visible; pointer-events:none;">' +
+        '<path d="M20 40 L24 50 L34 54 L24 58 L20 68 L16 58 L6 54 L16 50 Z" fill="#FFE49A" stroke="#8A5A12" stroke-width="2"/>' +
+        '<path d="M70 90 L73 98 L81 101 L73 104 L70 112 L67 104 L59 101 L67 98 Z" fill="#B47BE0" stroke="#5C3A78" stroke-width="2"/>' +
+        '<path d="M35 140 L38 148 L46 151 L38 154 L35 162 L32 154 L24 151 L32 148 Z" fill="#FF7BAC" stroke="#8A3A5C" stroke-width="2"/></svg>';
       default: return '';
     }
   }
@@ -2255,7 +2286,6 @@
             else eq.push(item.id);
             setEquipped(eq);
             renderWardrobeScreen();
-            triggerPoseAnimation();
             ensureAudio(); tone(600,0.08,'sine',0.1,0);
           });
         }
@@ -2282,7 +2312,6 @@
               const eq = getEquippedOwner(); eq.push(item.id); setEquippedOwner(eq);
               ensureAudio(); playBooster();
               renderWardrobeScreen();
-              triggerPoseAnimation();
             } else {
               ensureAudio(); tone(160,0.15,'sawtooth',0.1,0);
               card.classList.add('shake'); setTimeout(()=>card.classList.remove('shake'), 300);
@@ -2293,20 +2322,12 @@
             else eq.push(item.id);
             setEquippedOwner(eq);
             renderWardrobeScreen();
-            triggerPoseAnimation();
             ensureAudio(); tone(600,0.08,'sine',0.1,0);
           }
         });
         grid.appendChild(card);
       });
     }
-  }
-  function triggerPoseAnimation(){
-    const target = wardrobeActiveTab==='dog' ? document.getElementById('heroDogWardrobe') : document.getElementById('ownerWardrobePreview');
-    if(!target) return;
-    target.classList.remove('strike-pose');
-    void target.offsetWidth;
-    target.classList.add('strike-pose');
   }
   const NODE_COORDS = [
     {x:160, y:30}, {x:80, y:150}, {x:230, y:270}, {x:70, y:390}, {x:200, y:510}, {x:150, y:615}
