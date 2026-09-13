@@ -552,19 +552,23 @@
     </div>
   </div>
 
-  <div id="wardrobeScreen" class="screen hidden" style="align-items:center; text-align:center;">
-    <div class="map-title" style="font-size:22px;">Dress Up</div>
-    <div class="tab-bar" style="max-width:220px; border-top:none; padding-top:0; margin-top:4px;">
-      <div class="tab-btn active" id="wardrobeTabDog">Dog</div>
-      <div class="tab-btn" id="wardrobeTabOwner">Owner</div>
+  <div id="wardrobeScreen" class="screen hidden" style="align-items:center; text-align:center; position:relative; overflow:hidden;
+    background-image:url('https://raw.githubusercontent.com/clomoney13/woof/main/assets/dressing-room-background.png');
+    background-size:cover; background-position:center top;">
+    <div class="tab-bar" style="max-width:220px; border-top:none; padding-top:10px; margin-top:0; position:relative; z-index:1;">
+      <div class="tab-btn active" id="wardrobeTabDog" style="color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.5);">Dog</div>
+      <div class="tab-btn" id="wardrobeTabOwner" style="color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.5);">Owner</div>
     </div>
-    <div style="position:relative; width:130px; height:112px; margin:10px auto;">
+    <div style="position:relative; width:150px; height:130px; margin:60px auto 0; position:relative; z-index:1;">
       <div id="heroDogWardrobe" style="width:100%; height:100%;"></div>
-      <div class="owner-figure hidden" id="ownerWardrobePreview" style="position:absolute; top:0; left:0;"></div>
+      <div class="owner-figure hidden" id="ownerWardrobePreview" style="position:absolute; top:0; left:0; width:100%; height:100%;"></div>
     </div>
-    <div class="caption" id="wardrobeCaption">Tap an unlocked item to try it on!</div>
-    <div id="wardrobeGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; max-width:300px; margin:14px 0;"></div>
-    <button id="wardrobeBackBtn" class="action-btn" style="max-width:260px;">Back</button>
+    <div style="flex:1;"></div>
+    <div style="background:rgba(255,251,240,0.92); border-top:3px solid var(--ink); border-radius:22px 22px 0 0; padding:12px 14px 16px; width:100%; position:relative; z-index:1; box-shadow:0 -4px 16px rgba(0,0,0,0.15);">
+      <div class="caption" id="wardrobeCaption" style="margin:0 auto 8px;">Tap an unlocked item to try it on!</div>
+      <div id="wardrobeGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; max-width:300px; margin:0 auto 10px;"></div>
+      <button id="wardrobeBackBtn" class="action-btn" style="max-width:260px;">Back</button>
+    </div>
   </div>
 
   <div id="cardsScreen" class="screen hidden" style="align-items:center; text-align:center;">
