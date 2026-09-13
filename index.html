@@ -257,6 +257,12 @@
   .slider-row{ display:flex; align-items:center; gap:8px; width:100%; margin:6px 0; }
   .slider-row label{ font-size:10px; font-weight:700; color:var(--ink); width:44px; text-align:left; flex-shrink:0; }
   .slider-row input[type=range]{ flex:1; height:20px; }
+  .creator-cat-tabs{ display:flex; gap:4px; width:100%; justify-content:center; flex-wrap:wrap; }
+  .creator-cat-btn{ padding:6px 10px; border-radius:12px; border:2px solid var(--ink); background:#fff; font-size:10.5px; font-weight:700; color:var(--ink); cursor:pointer; }
+  .creator-cat-btn.active{ background:var(--red); color:#fff; }
+  .creator-swatch{ width:34px; height:34px; border-radius:50%; border:3px solid var(--ink); cursor:pointer; position:relative; flex-shrink:0; }
+  .creator-swatch.selected{ box-shadow:0 0 0 3px rgba(123,201,111,0.7); }
+  .creator-swatch.selected::after{ content:'✓'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:14px; text-shadow:0 1px 2px rgba(0,0,0,0.5); }
   .owner-hair{ position:absolute; top:-3px; left:13px; width:38px; height:20px; background:#8A5A3C; border:2.5px solid var(--ink); border-radius:50% 50% 15% 15%; z-index:1; }
   .owner-head{ position:absolute; top:2px; left:15px; width:32px; height:30px; background:#F2C79A; border:2.5px solid var(--ink); border-radius:50%; z-index:2; }
   .owner-eye{ position:absolute; top:14px; width:3px; height:4px; background:var(--ink); border-radius:50%; }
@@ -580,11 +586,16 @@
     </div>
     <div style="background:rgba(255,251,240,0.92); border-top:3px solid var(--ink); border-radius:22px 22px 0 0; padding:12px 14px 16px; width:100%; position:relative; z-index:1; box-shadow:0 -4px 16px rgba(0,0,0,0.15);">
       <div class="caption" id="wardrobeCaption" style="margin:0 auto 8px;">Tap an unlocked item to try it on!</div>
-      <div id="ownerSlidersPanel" class="hidden" style="width:100%; max-width:280px; margin:0 auto 8px;">
-        <div class="slider-row"><label>Skin</label><input type="range" id="sliderSkin" min="0" max="360"></div>
-        <div class="slider-row"><label>Hair</label><input type="range" id="sliderHair" min="0" max="360"></div>
-        <div class="slider-row"><label>Eyes</label><input type="range" id="sliderEyes" min="0" max="360"></div>
-        <div class="slider-row"><label>Width</label><input type="range" id="sliderWidth" min="80" max="120"></div>
+      <div id="ownerCreatorPanel" class="hidden" style="width:100%; max-width:300px; margin:0 auto 8px;">
+        <div class="creator-cat-tabs">
+          <div class="creator-cat-btn active" data-cat="skin">Skin</div>
+          <div class="creator-cat-btn" data-cat="hair">Hair</div>
+          <div class="creator-cat-btn" data-cat="eyes">Eyes</div>
+          <div class="creator-cat-btn" data-cat="body">Body</div>
+          <div class="creator-cat-btn" data-cat="outfit">Outfit</div>
+        </div>
+        <div id="creatorContentArea" style="min-height:70px; display:flex; flex-wrap:wrap; gap:9px; justify-content:center; align-items:center; margin:12px 0 4px;"></div>
+        <button id="randomizeBtn" class="action-btn" style="max-width:180px; margin:2px auto 0; display:block;">Surprise Me!</button>
       </div>
       <div id="wardrobeGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; max-width:300px; margin:0 auto 10px;"></div>
       <button id="wardrobeBackBtn" class="action-btn" style="max-width:260px;">Back</button>
@@ -1224,20 +1235,20 @@
       default: return '';
     }
   }
+  const SKIN_SWATCHES = ['#FFE0BD','#F1C27D','#E0AC69','#C68642','#8D5524','#5C3A21','#3B2219','#FFDBAC'];
+  const HAIR_SWATCHES = ['#2C1B10','#5C3A21','#8B5A2B','#D2A679','#E8B830','#B0463F','#7B4FE0','#4FB8E8'];
+  const EYE_SWATCHES = ['#4A3B2A','#2E5339','#3A5FA0','#6B4226','#1C1C1C','#7B4FE0','#4FD1C1','#E8425F'];
+  const OUTFIT_SWATCHES = ['#E8425F','#4FB8E8','#7BC96F','#FFD447','#B47BE0','#FF7BAC','#E8B830','#3B2A45'];
   function getOwnerParams(){
     try{
       const p = JSON.parse(localStorage.getItem('ownerParams'));
       if(p) return p;
     }catch(e){}
-    return { skin:36, hair:24, eyes:210, outfit:350, width:1.0 };
+    return { skin:'#F2C79A', hair:'#8A5A3C', eyes:'#4A3B2A', outfit:'#E8425F', width:1.0 };
   }
   function setOwnerParams(p){ localStorage.setItem('ownerParams', JSON.stringify(p)); }
-  function hsl(h, s, l){ return 'hsl(' + Math.round(h) + ',' + s + '%,' + l + '%)'; }
   function ownerCharacterSVG(p){
-    const skin = hsl(p.skin, 45, 68);
-    const hair = hsl(p.hair, 55, 35);
-    const eyes = hsl(p.eyes, 55, 40);
-    const outfit = hsl(p.outfit, 55, 55);
+    const skin = p.skin, hair = p.hair, eyes = p.eyes, outfit = p.outfit;
     const sx = p.width;
     return '<svg viewBox="0 0 200 400" style="width:100%; height:100%; overflow:visible;">' +
       '<g style="transform:scaleX(' + sx + '); transform-origin:100px 200px;">' +
@@ -2307,32 +2318,58 @@
   });
   document.getElementById('wardrobeBackBtn').addEventListener('click', showMap);
   document.getElementById('wardrobeTabDog').addEventListener('click', () => { wardrobeActiveTab='dog'; renderWardrobeScreen(); });
-  ['sliderSkin','sliderHair','sliderEyes','sliderWidth'].forEach(id => {
-    document.getElementById(id).addEventListener('input', () => {
-      const p = getOwnerParams();
-      p.skin = +document.getElementById('sliderSkin').value;
-      p.hair = +document.getElementById('sliderHair').value;
-      p.eyes = +document.getElementById('sliderEyes').value;
-      p.width = +document.getElementById('sliderWidth').value / 100;
-      setOwnerParams(p);
-      renderOwnerOnFigure('ownerWardrobePreview', 'ownerOverlayWardrobe');
-    });
+  let creatorActiveCat = 'skin';
+  document.querySelectorAll('.creator-cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => { creatorActiveCat = btn.dataset.cat; renderCreatorPanel(); });
   });
+  document.getElementById('randomizeBtn').addEventListener('click', () => {
+    const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+    const pp = { skin:pick(SKIN_SWATCHES), hair:pick(HAIR_SWATCHES), eyes:pick(EYE_SWATCHES), outfit:pick(OUTFIT_SWATCHES), width: 0.85+Math.random()*0.3 };
+    setOwnerParams(pp);
+    renderOwnerOnFigure('ownerWardrobePreview', 'ownerOverlayWardrobe');
+    renderCreatorPanel();
+    ensureAudio(); playBooster();
+  });
+  function renderCreatorPanel(){
+    document.querySelectorAll('.creator-cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat===creatorActiveCat));
+    const area = document.getElementById('creatorContentArea');
+    area.innerHTML = '';
+    const p = getOwnerParams();
+    if(creatorActiveCat === 'body'){
+      area.innerHTML = '<div class="slider-row" style="max-width:220px;"><label>Width</label><input type="range" id="sliderWidth" min="80" max="120" value="'+Math.round(p.width*100)+'"></div>';
+      document.getElementById('sliderWidth').addEventListener('input', (e) => {
+        const pp = getOwnerParams(); pp.width = +e.target.value/100; setOwnerParams(pp);
+        renderOwnerOnFigure('ownerWardrobePreview', 'ownerOverlayWardrobe');
+      });
+      return;
+    }
+    const paletteMap = { skin:SKIN_SWATCHES, hair:HAIR_SWATCHES, eyes:EYE_SWATCHES, outfit:OUTFIT_SWATCHES };
+    const palette = paletteMap[creatorActiveCat];
+    if(!palette) return;
+    palette.forEach(color => {
+      const sw = document.createElement('div');
+      sw.className = 'creator-swatch' + (p[creatorActiveCat]===color ? ' selected' : '');
+      sw.style.background = color;
+      sw.addEventListener('click', () => {
+        const pp = getOwnerParams(); pp[creatorActiveCat] = color; setOwnerParams(pp);
+        renderOwnerOnFigure('ownerWardrobePreview', 'ownerOverlayWardrobe');
+        renderCreatorPanel();
+        ensureAudio(); tone(600,0.06,'sine',0.1,0);
+      });
+      area.appendChild(sw);
+    });
+  }
   document.getElementById('wardrobeTabOwner').addEventListener('click', () => { wardrobeActiveTab='owner'; renderWardrobeScreen(); });
   function renderWardrobeScreen(){
     document.getElementById('wardrobeTabDog').classList.toggle('active', wardrobeActiveTab==='dog');
     document.getElementById('wardrobeTabOwner').classList.toggle('active', wardrobeActiveTab==='owner');
     document.getElementById('heroDogWardrobe').classList.toggle('hidden', wardrobeActiveTab!=='dog');
     document.getElementById('ownerWardrobePreview').classList.toggle('hidden', wardrobeActiveTab!=='owner');
-    document.getElementById('ownerSlidersPanel').classList.toggle('hidden', wardrobeActiveTab!=='owner');
+    document.getElementById('ownerCreatorPanel').classList.toggle('hidden', wardrobeActiveTab!=='owner');
     if(wardrobeActiveTab==='dog'){ renderHeroDog('heroDogWardrobe', getEquipped()); }
     else {
       renderOwnerOnFigure('ownerWardrobePreview', 'ownerOverlayWardrobe');
-      const p = getOwnerParams();
-      document.getElementById('sliderSkin').value = p.skin;
-      document.getElementById('sliderHair').value = p.hair;
-      document.getElementById('sliderEyes').value = p.eyes;
-      document.getElementById('sliderWidth').value = Math.round(p.width*100);
+      renderCreatorPanel();
     }
     const grid = document.getElementById('wardrobeGrid');
     grid.innerHTML = '';
